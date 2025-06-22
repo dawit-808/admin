@@ -1,0 +1,49 @@
+.user_row {
+  display: grid;
+  grid-template-columns: 40px 1.5fr 2fr 2fr 2fr 2fr 100px 80px;
+  padding: 16px 24px;
+  align-items: center;
+  border-top: 0.5px solid #2d3340;
+  background-color: #1c2434;
+  transition: background-color 0.2s ease;
+  font-size: 15px;
+  color: white;
+}
+
+.user_row:nth-child(even) {
+  background-color: #1c2434;
+}
+
+.user_row:hover {
+  background-color: #343d4e;
+}
+
+.payment {
+  font-size: 1em;
+  font-weight: 500;
+}
+
+.action_icons {
+  display: flex;
+  gap: 10px;
+  justify-content: flex-start;
+}
+
+.action_icons i {
+  font-size: 1rem;
+  cursor: pointer;
+  transition: color 0.2s ease;
+}
+
+@media (max-width: 768px) {
+  .user_row {
+    grid-template-columns: 1fr;
+    grid-row-gap: 8px;
+    text-align: left;
+  }
+
+  .action_icons {
+    justify-content: flex-start;
+    margin-top: 8px;
+  }
+}

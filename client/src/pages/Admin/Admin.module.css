@@ -1,0 +1,15 @@
+.user_container {
+  max-width: 1000px;
+  margin: 60px auto;
+  background-color: #1c2434;
+  border-radius: 12px;
+  overflow: hidden;
+  box-shadow: 0 6px 16px rgba(0, 0, 0, 0.06);
+}
+
+.red {
+  color: #d64749;
+}
+.green {
+  color: #3bd671;
+}

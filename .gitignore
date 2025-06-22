@@ -1,0 +1,26 @@
+# Common
+node_modules
+.env
+dist
+*.log
+.DS_Store
+
+# Server-specific
+server/node_modules/
+server/dist/
+server/.env
+
+# Client-specific
+client/node_modules/
+client/dist/
+client/.env
+
+# Editor/IDE
+.vscode/*
+!.vscode/extensions.json
+.idea
+*.suo
+*.ntvs*
+*.njsproj
+*.sln
+*.sw?
