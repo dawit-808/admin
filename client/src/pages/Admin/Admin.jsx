@@ -30,7 +30,8 @@ function Admin() {
         users.map(
           (
             {
-              id,
+              id, // use this internally
+              member_code, // show this instead of UUID
               name,
               training_type,
               training_day,
@@ -48,7 +49,8 @@ function Admin() {
               <UserList
                 key={id}
                 order={i + 1}
-                id={id}
+                id={id} // can still be used internally for delete/edit
+                memberCode={member_code} // display this in table
                 name={name}
                 trainingType={training_type}
                 trainingDay={training_day}
