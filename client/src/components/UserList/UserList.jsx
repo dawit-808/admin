@@ -13,6 +13,7 @@ const UserList = (props) => {
     paymentStatus,
     btnClass,
     order,
+    onDelete, // 👈 receive delete function
   } = props;
 
   return (
@@ -35,8 +36,17 @@ const UserList = (props) => {
         </span>
       </div>
       <div className={classes.action_icons}>
-        <i className="bi-pencil-square" title="Edit"></i>
-        <i className="bi-trash" title="Delete"></i>
+        <i
+          className="bi-pencil-square"
+          title="Edit"
+          style={{ cursor: "pointer" }}
+        ></i>
+        <i
+          className="bi-trash"
+          title="Delete"
+          onClick={() => onDelete(id)}
+          style={{ cursor: "pointer", color: "crimson", marginLeft: "10px" }}
+        ></i>
       </div>
     </div>
   );

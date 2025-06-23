@@ -21,6 +21,18 @@ function Admin() {
       });
   }, []);
 
+  // delete user
+  const handleDelete = async (id) => {
+    if (!window.confirm("Are you sure you want to delete this user?")) return;
+
+    try {
+      await axios.delete(`http://localhost:5000/users/${id}`);
+      setUsers((prev) => prev.filter((user) => user.id !== id));
+    } catch (err) {
+      console.error("Error deleting user:", err);
+    }
+  };
+
   return (
     <div className={`container gx-0 ${classes.user_container}`}>
       <TableHeader />
@@ -49,14 +61,15 @@ function Admin() {
               <UserList
                 key={id}
                 order={i + 1}
-                id={id} // can still be used internally for delete/edit
-                memberCode={member_code} // display this in table
+                id={id}
+                memberCode={member_code}
                 name={name}
                 trainingType={training_type}
                 trainingDay={training_day}
                 trainingSchedule={training_schedule}
                 paymentStatus={payment_status}
                 btnClass={btnClass}
+                onDelete={handleDelete} // 👈 pass it here
               />
             );
           }
