@@ -8,13 +8,24 @@ const router = express.Router();
 async function generateMemberCode() {
   const [rows] = await pool.query("SELECT COUNT(*) as count FROM users");
   const count = rows[0].count + 1;
-  return `GYM${String(count).padStart(3, "0")}`; // e.g., GYM007
+  return `GYM${String(count).padStart(3, "0")}`;
 }
 
-// GET all users
+// GET all users with training details
 router.get("/", async (req, res) => {
   try {
-    const [rows] = await pool.query("SELECT * FROM users");
+    const [rows] = await pool.query(`
+      SELECT 
+        u.id,
+        u.member_code,
+        u.name,
+        u.payment_status,
+        t.name AS training_type,
+        t.training_day,
+        t.training_schedule
+      FROM users u
+      JOIN training_types t ON u.training_type_id = t.id
+    `);
     res.json(rows);
   } catch (err) {
     console.error(err);
@@ -22,17 +33,15 @@ router.get("/", async (req, res) => {
   }
 });
 
-// POST a new user
+// POST a new user (with training_type_id)
 router.post("/", async (req, res) => {
   const {
     name,
-    training_type,
-    training_day,
-    training_schedule,
+    training_type_id, // now just pass the ID
     payment_status,
   } = req.body;
 
-  if (!name || !training_type || !training_day || !training_schedule) {
+  if (!name || !training_type_id) {
     return res.status(400).json({ error: "Missing required fields" });
   }
 
@@ -40,39 +49,44 @@ router.post("/", async (req, res) => {
     const id = uuidv4();
     const member_code = await generateMemberCode();
 
-    const insertQuery = `
-      INSERT INTO users (id, member_code, name, training_type, training_day, training_schedule, payment_status)
-      VALUES (?, ?, ?, ?, ?, ?, ?)
-    `;
+    await pool.query(
+      `INSERT INTO users (id, member_code, name, training_type_id, payment_status)
+       VALUES (?, ?, ?, ?, ?)`,
+      [id, member_code, name, training_type_id, payment_status || "unpaid"]
+    );
 
-    await pool.query(insertQuery, [
-      id,
-      member_code,
-      name,
-      training_type,
-      training_day,
-      training_schedule,
-      payment_status || "unpaid",
-    ]);
-
-    res.status(201).json({
-      message: "User created successfully",
-    });
+    res.status(201).json({ message: "User created successfully" });
   } catch (err) {
     console.error("Error creating user:", err);
     res.status(500).json({ error: "Failed to create user" });
   }
 });
 
-// get single user with the id
-
+// GET single user with training info
 router.get("/:id", async (req, res) => {
   const { id } = req.params;
   try {
-    const [rows] = await pool.query("SELECT * FROM users WHERE id = ?", [id]);
+    const [rows] = await pool.query(
+      `
+      SELECT 
+        u.id,
+        u.member_code,
+        u.name,
+        u.payment_status,
+        t.name AS training_type,
+        t.training_day,
+        t.training_schedule
+      FROM users u
+      JOIN training_types t ON u.training_type_id = t.id
+      WHERE u.id = ?
+    `,
+      [id]
+    );
+
     if (rows.length === 0) {
       return res.status(404).json({ error: "User not found" });
     }
+
     res.json(rows[0]);
   } catch (err) {
     console.error("Error fetching user:", err);

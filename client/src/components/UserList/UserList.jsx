@@ -1,5 +1,6 @@
 import { useNavigate } from "react-router-dom";
 import classes from "./UserList.module.css";
+import DeleteIcon from "@mui/icons-material/Delete";
 
 const UserList = (props) => {
   const navigate = useNavigate();
@@ -36,17 +37,11 @@ const UserList = (props) => {
         </span>
       </div>
       <div className={classes.action_icons}>
-        <i
-          className="bi-pencil-square"
-          title="Edit"
-          style={{ cursor: "pointer" }}
-        ></i>
-        <i
-          className="bi-trash"
+        <DeleteIcon
           title="Delete"
           onClick={() => onDelete(id)}
           style={{ cursor: "pointer", color: "crimson", marginLeft: "10px" }}
-        ></i>
+        ></DeleteIcon>
       </div>
     </div>
   );

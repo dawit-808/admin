@@ -12,7 +12,7 @@ const TableHeader = () => {
         <div>training day</div>
         <div>training schedule</div>
         <div>Payment</div>
-        <div>Actions</div>
+        <div>Delete</div>
       </div>
     </>
   );
