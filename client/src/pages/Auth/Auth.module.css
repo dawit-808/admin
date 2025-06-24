@@ -1,0 +1,78 @@
+.authWrapper {
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  height: 100vh;
+  background-color: #0f172a;
+  color: white;
+}
+
+.card {
+  background-color: #1c2434;
+  padding: 32px;
+  border-radius: 12px;
+  box-shadow: 0 0 8px rgba(0, 0, 0, 0.4);
+  width: 100%;
+  max-width: 400px;
+}
+
+.title {
+  text-align: center;
+  margin-bottom: 24px;
+  font-size: 24px;
+}
+
+.input {
+  width: 100%;
+  padding: 12px 14px;
+  margin-bottom: 16px;
+  border: 1px solid #2d3340;
+  border-radius: 8px;
+  background-color: #0f172a;
+  color: white;
+  font-size: 15px;
+}
+
+.input:focus {
+  outline: none;
+  border-color: #3bd671;
+}
+
+.button {
+  width: 100%;
+  padding: 12px;
+  background-color: #3bd671;
+  border: none;
+  border-radius: 8px;
+  font-weight: bold;
+  color: black;
+  cursor: pointer;
+  font-size: 15px;
+  transition: background-color 0.2s ease;
+}
+
+.button:hover {
+  background-color: #34c263;
+}
+
+.toggle {
+  text-align: center;
+  margin-top: 16px;
+  font-size: 14px;
+}
+
+.toggle span {
+  color: #3bd671;
+  cursor: pointer;
+  text-decoration: underline;
+}
+.error {
+  background-color: #ff3e3e1a;
+  color: #ff5e5e;
+  padding: 12px;
+  border: 1px solid #ff5e5e;
+  border-radius: 8px;
+  margin-bottom: 16px;
+  text-align: center;
+  font-size: 14px;
+}

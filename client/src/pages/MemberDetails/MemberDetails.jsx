@@ -1,6 +1,7 @@
 import { useParams } from "react-router-dom";
 import { useEffect, useState } from "react";
 import axios from "axios";
+import styles from "./MemberDetails.module.css";
 
 function MemberDetails() {
   const { id } = useParams();
@@ -13,26 +14,39 @@ function MemberDetails() {
       .catch((err) => console.error("Error fetching member:", err));
   }, [id]);
 
-  if (!user) return <p>Loading...</p>;
+  if (!user) return <p className={styles.loading}>Loading member details...</p>;
 
   return (
-    <div className="container">
-      <h2>Member Details: {user.member_code}</h2>
-      <p>
-        <strong>Name:</strong> {user.name}
-      </p>
-      <p>
-        <strong>Training Type:</strong> {user.training_type}
-      </p>
-      <p>
-        <strong>Training Day:</strong> {user.training_day}
-      </p>
-      <p>
-        <strong>Training Schedule:</strong> {user.training_schedule}
-      </p>
-      <p>
-        <strong>Payment Status:</strong> {user.payment_status}
-      </p>
+    <div className={styles.container}>
+      <h2 className={styles.title}>👤 Member: {user.member_code}</h2>
+      <div className={styles.card}>
+        <div className={styles.field}>
+          <span className={styles.label}>Name:</span>
+          <span className={styles.value}>{user.name}</span>
+        </div>
+        <div className={styles.field}>
+          <span className={styles.label}>Training Type:</span>
+          <span className={styles.value}>{user.training_type}</span>
+        </div>
+        <div className={styles.field}>
+          <span className={styles.label}>Training Day:</span>
+          <span className={styles.value}>{user.training_day}</span>
+        </div>
+        <div className={styles.field}>
+          <span className={styles.label}>Schedule:</span>
+          <span className={styles.value}>{user.training_schedule}</span>
+        </div>
+        <div className={styles.field}>
+          <span className={styles.label}>Payment Status:</span>
+          <span
+            className={`${styles.value} ${
+              user.payment_status === "paid" ? styles.paid : styles.unpaid
+            }`}
+          >
+            {user.payment_status}
+          </span>
+        </div>
+      </div>
     </div>
   );
 }

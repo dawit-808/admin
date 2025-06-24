@@ -1,12 +1,16 @@
 .user_container {
-  max-width: 1000px;
   margin: 60px auto;
+  padding: 2rem;
   background-color: #1c2434;
   border-radius: 12px;
   overflow: hidden;
   box-shadow: 0 6px 16px rgba(0, 0, 0, 0.06);
 }
-
+.title {
+  color: #3bd671;
+  font-size: 1.8rem;
+  margin-bottom: 1.5rem;
+}
 .red {
   color: #d64749;
 }

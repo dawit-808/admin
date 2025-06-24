@@ -1,7 +1,7 @@
 .user_row {
   display: grid;
   grid-template-columns: 40px 1.5fr 2fr 2fr 2fr 2fr 100px 80px;
-  padding: 16px 24px;
+  padding: 12px 24px;
   align-items: center;
   border-top: 0.5px solid #2d3340;
   background-color: #1c2434;

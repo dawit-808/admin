@@ -35,45 +35,33 @@ function Admin() {
 
   return (
     <div className={`container gx-0 ${classes.user_container}`}>
+      <h2 className={classes.title}>Members</h2>
       <TableHeader />
       {loading ? (
         <p>Loading users...</p>
       ) : (
-        users.map(
-          (
-            {
-              id, // use this internally
-              member_code, // show this instead of UUID
-              name,
-              training_type,
-              training_day,
-              training_schedule,
-              payment_status,
-            },
-            i
-          ) => {
-            const btnClass =
-              payment_status.toLowerCase() === "paid"
-                ? classes.green
-                : classes.red;
+        users.map((user, i) => {
+          const btnClass =
+            user.payment_status.toLowerCase() === "paid"
+              ? classes.green
+              : classes.red;
 
-            return (
-              <UserList
-                key={id}
-                order={i + 1}
-                id={id}
-                memberCode={member_code}
-                name={name}
-                trainingType={training_type}
-                trainingDay={training_day}
-                trainingSchedule={training_schedule}
-                paymentStatus={payment_status}
-                btnClass={btnClass}
-                onDelete={handleDelete} // 👈 pass it here
-              />
-            );
-          }
-        )
+          return (
+            <UserList
+              key={user.id}
+              order={i + 1}
+              id={user.id}
+              memberCode={user.member_code}
+              name={user.name}
+              trainingType={user.training_type}
+              trainingDay={user.training_day}
+              trainingSchedule={user.training_schedule}
+              paymentStatus={user.payment_status}
+              btnClass={btnClass}
+              onDelete={handleDelete}
+            />
+          );
+        })
       )}
     </div>
   );

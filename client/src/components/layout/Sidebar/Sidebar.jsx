@@ -3,12 +3,18 @@ import { Tooltip } from "@mui/material";
 import ArticleIcon from "@mui/icons-material/Article";
 import DirectionsRunIcon from "@mui/icons-material/DirectionsRun";
 import BarChartIcon from "@mui/icons-material/BarChart";
+import PersonAddIcon from "@mui/icons-material/PersonAdd";
 import LogoutIcon from "@mui/icons-material/Logout";
 import classes from "./Sidebar.module.css";
-
-const iconStyle = { color: "#72839e", fontSize: "20px" };
+import axios from "axios";
 
 function Sidebar() {
+  const handleLogout = () => {
+    localStorage.removeItem("token");
+    delete axios.defaults.headers.common["Authorization"];
+    window.location.href = "/login";
+  };
+
   return (
     <aside className={classes.sidebar}>
       <div className={classes.navSection}>
@@ -20,6 +26,7 @@ function Sidebar() {
               </Link>
             </Tooltip>
           </li>
+
           <li>
             <Tooltip title="Training Types" placement="right">
               <Link to="/training-types">
@@ -27,10 +34,19 @@ function Sidebar() {
               </Link>
             </Tooltip>
           </li>
+
           <li>
             <Tooltip title="Statistics" placement="right">
               <Link to="/statistics">
                 <BarChartIcon className={classes.icon} />
+              </Link>
+            </Tooltip>
+          </li>
+
+          <li>
+            <Tooltip title="Register Member" placement="right">
+              <Link to="/register-member">
+                <PersonAddIcon className={classes.icon} />
               </Link>
             </Tooltip>
           </li>
@@ -39,7 +55,7 @@ function Sidebar() {
 
       <div className={classes.logoutSection}>
         <Tooltip title="Logout" placement="right">
-          <button className={classes.logoutBtn}>
+          <button onClick={handleLogout} className={classes.logoutBtn}>
             <LogoutIcon className={classes.icon} />
           </button>
         </Tooltip>

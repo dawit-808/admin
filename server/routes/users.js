@@ -33,19 +33,24 @@ router.get("/", async (req, res) => {
   }
 });
 
-// POST a new user (with training_type_id)
+// POST a new user
 router.post("/", async (req, res) => {
-  const {
-    name,
-    training_type_id, // now just pass the ID
-    payment_status,
-  } = req.body;
+  const { name, training_type_id, payment_status } = req.body;
 
   if (!name || !training_type_id) {
     return res.status(400).json({ error: "Missing required fields" });
   }
 
   try {
+    // Check if training_type_id is valid
+    const [typeRows] = await pool.query(
+      "SELECT * FROM training_types WHERE id = ?",
+      [training_type_id]
+    );
+    if (typeRows.length === 0) {
+      return res.status(400).json({ error: "Invalid training_type_id" });
+    }
+
     const id = uuidv4();
     const member_code = await generateMemberCode();
 
@@ -55,10 +60,39 @@ router.post("/", async (req, res) => {
       [id, member_code, name, training_type_id, payment_status || "unpaid"]
     );
 
-    res.status(201).json({ message: "User created successfully" });
+    res.status(201).json({
+      message: "User created successfully",
+      user: { id, member_code, name, training_type_id },
+    });
   } catch (err) {
     console.error("Error creating user:", err);
     res.status(500).json({ error: "Failed to create user" });
+  }
+});
+
+// PUT: update profile image URL
+router.put("/:id/profile-img", async (req, res) => {
+  const { id } = req.params;
+  const { profile_img_url } = req.body;
+
+  if (!profile_img_url) {
+    return res.status(400).json({ error: "Missing profile_img_url" });
+  }
+
+  try {
+    const [result] = await pool.query(
+      "UPDATE users SET profile_img_url = ? WHERE id = ?",
+      [profile_img_url, id]
+    );
+
+    if (result.affectedRows === 0) {
+      return res.status(404).json({ error: "User not found" });
+    }
+
+    res.status(200).json({ message: "Profile image URL updated" });
+  } catch (err) {
+    console.error("Error updating profile image:", err);
+    res.status(500).json({ error: "Server error" });
   }
 });
 

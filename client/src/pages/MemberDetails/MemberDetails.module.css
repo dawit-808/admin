@@ -1,0 +1,53 @@
+.container {
+  padding: 24px;
+  background-color: #1c2434;
+  min-height: 100vh;
+  color: white;
+}
+
+.title {
+  font-size: 26px;
+  margin-bottom: 24px;
+  font-weight: 600;
+}
+
+.card {
+  background-color: #2d3340;
+  padding: 24px;
+  border-radius: 12px;
+  box-shadow: 0 0 10px rgba(0, 0, 0, 0.2);
+}
+
+.field {
+  display: flex;
+  justify-content: space-between;
+  margin-bottom: 16px;
+  border-bottom: 0.5px solid #343d4e;
+  padding-bottom: 8px;
+}
+
+.label {
+  font-weight: 500;
+  color: #aaa;
+  font-size: 15px;
+}
+
+.value {
+  font-size: 16px;
+  font-weight: 600;
+  color: white;
+}
+
+.paid {
+  color: #3bd671;
+}
+
+.unpaid {
+  color: #e26d6d;
+}
+
+.loading {
+  color: #aaa;
+  font-size: 16px;
+  padding: 2rem;
+}

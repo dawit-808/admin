@@ -1,12 +1,11 @@
+import classes from "./DashboardLayout.module.css";
 import Sidebar from "./Sidebar/Sidebar";
-// import Footer from "./Footer/Header";
 
 function DashboardLayout({ children }) {
   return (
-    <div>
+    <div className={classes.wrapper}>
       <Sidebar />
-      {/* <Footer /> */}
-      <main>{children}</main>
+      <main className={classes.main}>{children}</main>
     </div>
   );
 }

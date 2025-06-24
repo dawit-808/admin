@@ -1,22 +1,75 @@
 import { BrowserRouter as Router, Routes, Route } from "react-router-dom";
-import "./App.css";
 import DashboardLayout from "./components/layout/DashboardLayout";
 import Admin from "./pages/Admin/Admin";
 import MemberDetails from "./pages/MemberDetails/MemberDetails";
-// import TrainingTypePage from "./pages/TrainingTypePage";
-// import Stats from "./pages/Statistics";
+import TrainingType from "./pages/TrainingType/TrainingType";
+import Statistics from "./pages/Statistics/Statistics";
+import Auth from "./pages/Auth/Auth";
+import PrivateRoute from "./components/PrivateRoute/PrivateRoute";
+import RegisterMember from "./pages/RegisterMember/RegisterMember";
 
 function App() {
   return (
     <Router>
-      <DashboardLayout>
-        <Routes>
-          <Route path="/" element={<Admin />} />{" "}
-          <Route path="/member/:id" element={<MemberDetails />} />;
-          {/* <Route path="/training-types" element={<TrainingTypePage />} />
-          <Route path="/statistics" element={<Stats />} /> */}
-        </Routes>
-      </DashboardLayout>
+      <Routes>
+        {/* Login (No layout) */}
+        <Route path="/login" element={<Auth />} />
+
+        {/* Protected Routes */}
+        <Route
+          path="/"
+          element={
+            <PrivateRoute>
+              <DashboardLayout>
+                <Admin />
+              </DashboardLayout>
+            </PrivateRoute>
+          }
+        />
+        <Route
+          path="/member/:id"
+          element={
+            <PrivateRoute>
+              <DashboardLayout>
+                <MemberDetails />
+              </DashboardLayout>
+            </PrivateRoute>
+          }
+        />
+        <Route
+          path="/training-types"
+          element={
+            <PrivateRoute>
+              <DashboardLayout>
+                <TrainingType />
+              </DashboardLayout>
+            </PrivateRoute>
+          }
+        />
+        <Route
+          path="/statistics"
+          element={
+            <PrivateRoute>
+              <DashboardLayout>
+                <Statistics />
+              </DashboardLayout>
+            </PrivateRoute>
+          }
+        />
+        <Route
+          path="/register-member"
+          element={
+            <PrivateRoute>
+              <DashboardLayout>
+                <RegisterMember />
+              </DashboardLayout>
+            </PrivateRoute>
+          }
+        />
+
+        {/* 404 */}
+        {/* <Route path="*" element={<NotFound />} /> */}
+      </Routes>
     </Router>
   );
 }
