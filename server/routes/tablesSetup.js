@@ -3,7 +3,7 @@ import pool from "../db.js";
 
 const router = express.Router();
 
-router.post("/create-tables", async (req, res) => {
+router.post("/", async (req, res) => {
   try {
     // 1. training_types
     await pool.query(`

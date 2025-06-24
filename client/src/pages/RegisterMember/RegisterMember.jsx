@@ -1,8 +1,16 @@
 import { useState, useEffect, useRef } from "react";
 import axios from "axios";
-import classes from "./RegisterMember.module.css";
+import styles from "./RegisterMember.module.css";
 
-export default function RegisterMember() {
+const API_BASE_URL = "http://localhost:5000";
+
+const RegisterMember = () => {
+  // Refs
+  const videoRef = useRef(null);
+  const fileInputRef = useRef(null);
+  const streamRef = useRef(null);
+
+  // State
   const [formData, setFormData] = useState({
     name: "",
     trainingTypeId: "",
@@ -16,99 +24,183 @@ export default function RegisterMember() {
     success: null,
   });
 
-  const videoRef = useRef(null);
-  const fileInputRef = useRef(null);
-  const streamRef = useRef(null);
-
+  // Fetch training types on mount
   useEffect(() => {
     const fetchTrainingTypes = async () => {
       try {
-        const res = await axios.get("http://localhost:5000/training-types");
-        setTrainingTypes(res.data);
-        if (res.data.length > 0) {
-          setFormData((prev) => ({ ...prev, trainingTypeId: res.data[0].id }));
+        const response = await axios.get(`${API_BASE_URL}/training-types`);
+        setTrainingTypes(response.data);
+        if (response.data.length > 0) {
+          setFormData((prev) => ({
+            ...prev,
+            trainingTypeId: response.data[0].id,
+          }));
         }
-      } catch {
+      } catch (error) {
         setStatus((prev) => ({
           ...prev,
           error: "Failed to load training types.",
         }));
       }
     };
+
     fetchTrainingTypes();
   }, []);
 
+  // Camera setup and cleanup
+  useEffect(() => {
+    startCamera();
+    return stopCamera;
+  }, []);
+
+  // Camera functions
   const startCamera = async () => {
-    if (!navigator.mediaDevices?.getUserMedia || !videoRef.current) return;
     try {
-      if (streamRef.current) {
-        streamRef.current.getTracks().forEach((track) => track.stop());
-      }
       const stream = await navigator.mediaDevices.getUserMedia({ video: true });
       streamRef.current = stream;
       videoRef.current.srcObject = stream;
-      videoRef.current.play();
-      setStatus((prev) => ({ ...prev, error: null }));
-    } catch (err) {
-      console.warn("Camera access error:", err);
+      videoRef.current.play().catch(() => {});
+    } catch (error) {
       setStatus((prev) => ({
         ...prev,
-        error: "Camera access denied. Upload image instead.",
+        error: "Camera access denied. Please upload instead.",
       }));
     }
   };
 
-  useEffect(() => {
-    startCamera();
-    return () => {
-      if (streamRef.current) {
-        streamRef.current.getTracks().forEach((track) => track.stop());
-      }
-    };
-  }, []);
+  const stopCamera = () => {
+    if (streamRef.current) {
+      streamRef.current.getTracks().forEach((track) => track.stop());
+      streamRef.current = null;
+    }
+  };
 
+  // Image handling
+  const handleCapture = () => {
+    const video = videoRef.current;
+    const canvas = document.createElement("canvas");
+    canvas.width = video.videoWidth || 640;
+    canvas.height = video.videoHeight || 480;
+    canvas.getContext("2d").drawImage(video, 0, 0, canvas.width, canvas.height);
+
+    canvas.toBlob((blob) => {
+      if (!blob) return;
+      setImageFile(
+        new File([blob], `capture_${Date.now()}.jpg`, { type: "image/jpeg" })
+      );
+      stopCamera();
+    });
+  };
+
+  const convertToBase64 = (file) =>
+    new Promise((resolve, reject) => {
+      const reader = new FileReader();
+      reader.readAsDataURL(file);
+      reader.onload = () => {
+        const base64String = reader.result.split(",")[1];
+        resolve(base64String);
+      };
+      reader.onerror = (error) => reject(error);
+    });
+
+  // Improved image upload function with timeout
+  const uploadImageToImgBB = async (file) => {
+    try {
+      const base64Image = await convertToBase64(file);
+
+      // Add timeout to prevent hanging
+      const source = axios.CancelToken.source();
+      const timeout = setTimeout(() => {
+        source.cancel("Image upload timed out after 10 seconds");
+      }, 10000);
+
+      const response = await axios.post(
+        `${API_BASE_URL}/upload-image`,
+        {
+          image: base64Image,
+        },
+        {
+          cancelToken: source.token,
+        }
+      );
+
+      clearTimeout(timeout);
+
+      if (!response.data.url) {
+        throw new Error("Image upload failed - no URL returned");
+      }
+
+      return response.data.url;
+    } catch (error) {
+      if (axios.isCancel(error)) {
+        console.log("Image upload cancelled:", error.message);
+        throw new Error("Image upload took too long. Please try again.");
+      }
+      console.error("Image upload error:", error);
+      throw new Error(
+        "Failed to upload image. Please check your connection and try again."
+      );
+    }
+  };
+
+  // Form handling
   const handleInputChange = (e) => {
     const { name, value } = e.target;
     setFormData((prev) => ({ ...prev, [name]: value }));
   };
 
-  const handleCapture = () => {
-    const video = videoRef.current;
-    if (!video) return;
-    const canvas = document.createElement("canvas");
-    canvas.width = video.videoWidth || 640;
-    canvas.height = video.videoHeight || 480;
-    canvas.getContext("2d").drawImage(video, 0, 0, canvas.width, canvas.height);
-    canvas.toBlob(
-      (blob) => {
-        if (!blob) return;
-        const file = new File([blob], `capture_${Date.now()}.jpg`, {
-          type: "image/jpeg",
-          lastModified: Date.now(),
-        });
-        setImageFile(file);
-        if (streamRef.current) {
-          streamRef.current.getTracks().forEach((track) => track.stop());
-          streamRef.current = null;
-        }
-      },
-      "image/jpeg",
-      0.9
-    );
-  };
+  const handleSubmit = async (e) => {
+    e.preventDefault();
 
-  const handleImageChange = (e) => {
-    if (e.target.files?.length > 0) {
-      setImageFile(e.target.files[0]);
-      if (streamRef.current) {
-        streamRef.current.getTracks().forEach((track) => track.stop());
-        streamRef.current = null;
-      }
+    // Validate all fields including image
+    if (!formData.name || !formData.trainingTypeId || !imageFile) {
+      return setStatus({
+        loading: false,
+        error: "All fields including photo are required.",
+        success: null,
+      });
     }
-  };
 
-  const triggerFileInput = () => {
-    fileInputRef.current?.click();
+    setStatus({ loading: true, error: null, success: null });
+
+    try {
+      // 1. First create the user
+      const userResponse = await axios.post(`${API_BASE_URL}/users`, {
+        name: formData.name,
+        training_type_id: formData.trainingTypeId,
+        payment_status: formData.paymentStatus,
+      });
+      const userId = userResponse.data.user.id;
+
+      // 2. Then handle the image upload with proper error handling
+      let imageUrl;
+      try {
+        imageUrl = await uploadImageToImgBB(imageFile);
+      } catch (uploadError) {
+        // If image upload fails, delete the user we just created
+        await axios.delete(`${API_BASE_URL}/users/${userId}`);
+        throw new Error("Failed to upload profile image. Please try again.");
+      }
+
+      // 3. Update user with profile image
+      await axios.put(`${API_BASE_URL}/users/${userId}/profile-img`, {
+        profile_img_url: imageUrl,
+      });
+
+      // Success
+      setStatus({
+        loading: false,
+        error: null,
+        success: "Member registered successfully!",
+      });
+      resetForm();
+    } catch (error) {
+      setStatus({
+        loading: false,
+        error: error.message || "Registration failed. Please try again.",
+        success: null,
+      });
+    }
   };
 
   const resetForm = () => {
@@ -118,141 +210,49 @@ export default function RegisterMember() {
       paymentStatus: "unpaid",
     });
     setImageFile(null);
-    setStatus({ loading: false, error: null, success: null });
-    startCamera();
-  };
-
-  // Upload image to ImageKit
-  const uploadImageToImageKit = async (file) => {
-    // 1. Get authentication params from your backend
-    const { data: authParams } = await axios.get(
-      "http://localhost:5000/api/imagekit/auth"
-    );
-
-    // 2. Prepare form data
-    const formDataUpload = new FormData();
-    formDataUpload.append("file", file);
-    formDataUpload.append("fileName", file.name);
-    formDataUpload.append("signature", authParams.signature);
-    formDataUpload.append("token", authParams.token);
-    formDataUpload.append("expire", authParams.expire);
-
-    // 3. Upload to ImageKit endpoint
-    const uploadUrl = "https://upload.imagekit.io/api/v1/files/upload";
-
-    const res = await axios.post(uploadUrl, formDataUpload, {
-      headers: { "Content-Type": "multipart/form-data" },
-    });
-
-    return res.data.url; // returns the uploaded image URL
-  };
-
-  const handleSubmit = async (e) => {
-    e.preventDefault();
-    setStatus({ loading: true, error: null, success: null });
-
-    if (!formData.name || !formData.trainingTypeId) {
-      setStatus((prev) => ({
-        ...prev,
-        loading: false,
-        error: "Name and training type are required",
-      }));
-      return;
-    }
-
-    if (!imageFile) {
-      setStatus((prev) => ({
-        ...prev,
-        loading: false,
-        error: "Please capture or upload a profile image",
-      }));
-      return;
-    }
-
-    try {
-      // 1. Create user on your server WITHOUT image
-      const userRes = await axios.post("http://localhost:5000/users", {
-        name: formData.name,
-        training_type_id: formData.trainingTypeId,
-        payment_status: formData.paymentStatus,
-      });
-
-      const { id: userId } = userRes.data.user;
-
-      // 2. Upload image to ImageKit
-      const imageUrl = await uploadImageToImageKit(imageFile);
-
-      // 3. Update user profile with ImageKit URL
-      await axios.put(`http://localhost:5000/users/${userId}/profile-img`, {
-        profile_img_url: imageUrl,
-      });
-
-      setStatus({
-        loading: false,
-        error: null,
-        success: "Member registered successfully!",
-      });
-      resetForm();
-    } catch (err) {
-      console.error("Registration error:", err);
-      const errorMessage =
-        err.response?.data?.error || err.message || "Failed to register member";
-      setStatus((prev) => ({ ...prev, loading: false, error: errorMessage }));
-    }
-  };
-
-  const handleRetakePhoto = () => {
-    setImageFile(null);
-    setStatus({ loading: false, error: null, success: null });
     startCamera();
   };
 
   return (
-    <div className={classes.authWrapper}>
-      <div className={classes.card}>
-        <h2 className={classes.title}>Register New Member</h2>
+    <div className={styles.container}>
+      <div className={styles.card}>
+        <h2 className={styles.title}>Register New Member</h2>
 
+        {/* Status messages */}
         {status.error && (
-          <div className={classes.error}>
-            {/* error icon */}
+          <div className={`${styles.alert} ${styles.error}`}>
             {status.error}
           </div>
         )}
-
         {status.success && (
-          <div className={classes.success}>
-            {/* success icon */}
+          <div className={`${styles.alert} ${styles.success}`}>
             {status.success}
           </div>
         )}
 
-        <form onSubmit={handleSubmit} className={classes.formGrid}>
-          <div className={classes.leftColumn}>
-            <div className={classes.formGroup}>
-              <label htmlFor="name" className={classes.label}>
-                Full Name
-              </label>
+        <form onSubmit={handleSubmit} className={styles.form}>
+          <div className={styles.formSection}>
+            {/* Name Field */}
+            <div className={styles.formGroup}>
+              <label className={styles.label}>Full Name</label>
               <input
-                id="name"
+                type="text"
                 name="name"
-                className={classes.input}
-                placeholder="John Doe"
                 value={formData.name}
                 onChange={handleInputChange}
+                className={styles.input}
                 required
               />
             </div>
 
-            <div className={classes.formGroup}>
-              <label htmlFor="trainingTypeId" className={classes.label}>
-                Training Program
-              </label>
+            {/* Training Program */}
+            <div className={styles.formGroup}>
+              <label className={styles.label}>Training Program</label>
               <select
-                id="trainingTypeId"
                 name="trainingTypeId"
-                className={classes.input}
                 value={formData.trainingTypeId}
                 onChange={handleInputChange}
+                className={styles.input}
                 required
               >
                 {trainingTypes.map((type) => (
@@ -263,85 +263,94 @@ export default function RegisterMember() {
               </select>
             </div>
 
-            <div className={classes.formGroup}>
-              <label htmlFor="paymentStatus" className={classes.label}>
-                Payment Status
-              </label>
+            {/* Payment Status */}
+            <div className={styles.formGroup}>
+              <label className={styles.label}>Payment Status</label>
               <select
-                id="paymentStatus"
                 name="paymentStatus"
-                className={classes.input}
                 value={formData.paymentStatus}
                 onChange={handleInputChange}
+                className={styles.input}
               >
                 <option value="paid">Paid</option>
                 <option value="unpaid">Unpaid</option>
               </select>
             </div>
 
-            <input
-              type="file"
-              ref={fileInputRef}
-              accept="image/*"
-              onChange={handleImageChange}
-              className={classes.hiddenFileInput}
-            />
-
-            <div className={classes.buttonGroup}>
-              <button
-                type="button"
-                onClick={triggerFileInput}
-                className={`${classes.button} ${classes.secondaryButton}`}
-                disabled={status.loading}
-              >
-                Upload Photo
-              </button>
-
-              <button
-                type="submit"
-                className={classes.button}
-                disabled={status.loading}
-              >
-                {status.loading ? "Registering..." : "Register Member"}
-              </button>
-            </div>
+            {/* Submit Button */}
+            <button
+              type="submit"
+              className={`${styles.button} ${styles.primaryButton}`}
+              disabled={status.loading}
+            >
+              {status.loading ? (
+                <>
+                  <span className={styles.spinner}></span>
+                  Registering...
+                </>
+              ) : (
+                "Register Member"
+              )}
+            </button>
           </div>
 
-          <div className={classes.rightColumn}>
+          <div className={styles.imageSection}>
             {!imageFile ? (
-              <div className={classes.cameraSection}>
-                <div className={classes.cameraWrapper}>
+              <>
+                <div className={styles.cameraPreview}>
                   <video
                     ref={videoRef}
                     autoPlay
-                    playsInline
                     muted
-                    className={classes.video}
-                    style={{ backgroundColor: "black" }}
+                    className={styles.video}
                   />
                 </div>
-                <button
-                  type="button"
-                  onClick={handleCapture}
-                  className={`${classes.button} ${classes.captureButton}`}
-                >
-                  Capture Photo
-                </button>
-              </div>
+                <div className={styles.buttonGroup}>
+                  <button
+                    type="button"
+                    onClick={handleCapture}
+                    className={styles.button}
+                  >
+                    Capture Photo
+                  </button>
+                  <input
+                    type="file"
+                    ref={fileInputRef}
+                    accept="image/*"
+                    onChange={(e) => {
+                      if (e.target.files?.length > 0) {
+                        setImageFile(e.target.files[0]);
+                        stopCamera();
+                      }
+                    }}
+                    className={styles.hiddenFileInput}
+                  />
+                  <button
+                    type="button"
+                    onClick={() => fileInputRef.current?.click()}
+                    className={`${styles.button} ${styles.secondaryButton}`}
+                  >
+                    Upload Photo
+                  </button>
+                </div>
+              </>
             ) : (
-              <div className={classes.previewSection}>
-                <h3 className={classes.previewTitle}>Profile Preview</h3>
-                <div className={classes.previewWrapper}>
+              <div className={styles.imagePreview}>
+                <h3 className={styles.previewTitle}>Preview</h3>
+                <div className={styles.previewContainer}>
                   <img
                     src={URL.createObjectURL(imageFile)}
-                    alt="Member preview"
-                    className={classes.previewImage}
+                    alt="Preview"
+                    className={styles.previewImage}
                   />
                 </div>
                 <button
                   type="button"
-                  onClick={handleRetakePhoto}
-                  className={`${classes.button} ${classes.secondaryButton}`}
+                  onClick={() => {
+                    setImageFile(null);
+                    startCamera();
+                  }}
+                  className={`${styles.button} ${styles.secondaryButton}`}
                 >
                   Retake Photo
                 </button>
@@ -352,4 +361,6 @@ export default function RegisterMember() {
       </div>
     </div>
   );
-}
+};
+
+export default RegisterMember;
