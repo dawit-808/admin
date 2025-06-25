@@ -1,40 +1,63 @@
 import express from "express";
+import multer from "multer";
 import axios from "axios";
 import FormData from "form-data";
 
 const router = express.Router();
+const upload = multer(); // stores files in memory
+const IMGBB_API_KEY = process.env.IMGBB_API_KEY;
+const UPLOAD_TIMEOUT = 15000; // 15 seconds
 
-const IMGBB_API_KEY = "f29991c37db39ca41bd813521ed14932";
-
-router.post("/", async (req, res) => {
+router.post("/", upload.single("image"), async (req, res) => {
+  let timeout;
   try {
-    const { image } = req.body; // base64 string without data URL prefix
+    const imageFile = req.file;
 
-    if (!image) {
-      return res.status(400).json({ error: "No image provided" });
+    if (!imageFile) {
+      return res.status(400).json({ error: "No image file provided" });
     }
 
+    const base64Image = imageFile.buffer.toString("base64");
     const form = new FormData();
-    // Use the base64 string directly
-    form.append("image", image);
+    form.append("image", base64Image);
+
+    const controller = new AbortController();
+    timeout = setTimeout(() => controller.abort(), UPLOAD_TIMEOUT);
 
     const response = await axios.post(
       `https://api.imgbb.com/1/upload?key=${IMGBB_API_KEY}`,
       form,
       {
-        headers: {
-          ...form.getHeaders(),
-          "Content-Type": "multipart/form-data",
-        },
+        signal: controller.signal,
+        headers: form.getHeaders(),
+        maxContentLength: Infinity,
+        maxBodyLength: Infinity,
       }
     );
 
-    const imageUrl = response.data.data.url;
-    res.json({ url: imageUrl });
+    clearTimeout(timeout);
+
+    if (!response.data?.data?.url) {
+      throw new Error("Invalid response from ImgBB");
+    }
+
+    return res.json({
+      url: response.data.data.url,
+      delete_url: response.data.data.delete_url,
+    });
   } catch (err) {
-    console.error("ImgBB upload error:", err.response?.data || err.message);
-    res.status(500).json({
-      error: "Failed to upload image",
+    if (timeout) clearTimeout(timeout);
+
+    const statusCode =
+      err.code === "ECONNRESET" || err.name === "AbortError" ? 504 : 500;
+
+    const errorMessage =
+      err.code === "ECONNRESET" || err.name === "AbortError"
+        ? "Image upload timed out"
+        : "Failed to upload image";
+
+    return res.status(statusCode).json({
+      error: errorMessage,
       details: err.response?.data?.error?.message || err.message,
     });
   }

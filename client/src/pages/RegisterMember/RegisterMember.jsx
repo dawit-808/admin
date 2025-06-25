@@ -1,10 +1,12 @@
 import { useState, useEffect, useRef } from "react";
+import { useNavigate } from "react-router-dom";
 import axios from "axios";
 import styles from "./RegisterMember.module.css";
 
 const API_BASE_URL = "http://localhost:5000";
 
 const RegisterMember = () => {
+  const navigate = useNavigate();
   // Refs
   const videoRef = useRef(null);
   const fileInputRef = useRef(null);
@@ -92,55 +94,15 @@ const RegisterMember = () => {
     });
   };
 
-  const convertToBase64 = (file) =>
-    new Promise((resolve, reject) => {
-      const reader = new FileReader();
-      reader.readAsDataURL(file);
-      reader.onload = () => {
-        const base64String = reader.result.split(",")[1];
-        resolve(base64String);
-      };
-      reader.onerror = (error) => reject(error);
+  const uploadImageToImgBB = async (file) => {
+    const form = new FormData();
+    form.append("image", file);
+
+    const response = await axios.post(`${API_BASE_URL}/upload-image`, form, {
+      headers: { "Content-Type": "multipart/form-data" },
     });
 
-  // Improved image upload function with timeout
-  const uploadImageToImgBB = async (file) => {
-    try {
-      const base64Image = await convertToBase64(file);
-
-      // Add timeout to prevent hanging
-      const source = axios.CancelToken.source();
-      const timeout = setTimeout(() => {
-        source.cancel("Image upload timed out after 10 seconds");
-      }, 10000);
-
-      const response = await axios.post(
-        `${API_BASE_URL}/upload-image`,
-        {
-          image: base64Image,
-        },
-        {
-          cancelToken: source.token,
-        }
-      );
-
-      clearTimeout(timeout);
-
-      if (!response.data.url) {
-        throw new Error("Image upload failed - no URL returned");
-      }
-
-      return response.data.url;
-    } catch (error) {
-      if (axios.isCancel(error)) {
-        console.log("Image upload cancelled:", error.message);
-        throw new Error("Image upload took too long. Please try again.");
-      }
-      console.error("Image upload error:", error);
-      throw new Error(
-        "Failed to upload image. Please check your connection and try again."
-      );
-    }
+    return response.data.url;
   };
 
   // Form handling
@@ -194,6 +156,7 @@ const RegisterMember = () => {
         success: "Member registered successfully!",
       });
       resetForm();
+      navigate("/");
     } catch (error) {
       setStatus({
         loading: false,

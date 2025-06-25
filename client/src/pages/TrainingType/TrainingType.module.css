@@ -1,49 +1,338 @@
+/* Base Styles */
 .page {
-  padding: 24px;
-  background-color: #1c2434;
-  min-height: 100vh;
-  color: white;
+  max-width: 1200px;
+  margin: 0 auto;
+  padding: 2rem;
+  color: #fff;
+  font-family: "Segoe UI", system-ui, sans-serif;
+}
+
+.header {
+  margin-bottom: 2.5rem;
 }
 
 .title {
-  font-size: 28px;
-  margin-bottom: 24px;
+  font-size: 2.2rem;
+  font-weight: 700;
+  margin-bottom: 1.5rem;
+  display: flex;
+  align-items: center;
+  gap: 0.75rem;
+  color: #fff;
+}
+
+.titleIcon {
+  font-size: 1.8rem;
+}
+
+.tabs {
+  display: flex;
+  border-bottom: 1px solid rgba(255, 255, 255, 0.1);
+  margin-bottom: 2rem;
+}
+
+.tab {
+  padding: 0.75rem 1.5rem;
+  background: none;
+  border: none;
+  color: rgba(255, 255, 255, 0.7);
   font-weight: 600;
+  font-size: 1rem;
+  cursor: pointer;
+  position: relative;
+  transition: all 0.3s ease;
 }
 
-.loading {
-  color: #aaa;
-  font-size: 16px;
-  padding: 2rem;
+.tab:hover {
+  color: #fff;
 }
 
+.activeTab {
+  color: #3bd671;
+}
+
+.activeTab::after {
+  content: "";
+  position: absolute;
+  bottom: -1px;
+  left: 0;
+  width: 100%;
+  height: 3px;
+  background: #3bd671;
+  border-radius: 3px 3px 0 0;
+}
+
+/* Loading State */
+.loadingContainer {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  height: 300px;
+}
+
+.spinner {
+  width: 50px;
+  height: 50px;
+  border: 4px solid rgba(59, 214, 113, 0.2);
+  border-radius: 50%;
+  border-top-color: #3bd671;
+  animation: spin 1s ease-in-out infinite;
+  margin-bottom: 1rem;
+}
+
+@keyframes spin {
+  to {
+    transform: rotate(360deg);
+  }
+}
+
+.loadingText {
+  color: rgba(255, 255, 255, 0.7);
+  font-size: 1.1rem;
+}
+
+/* Training Types Grid */
 .grid {
   display: grid;
-  grid-template-columns: repeat(auto-fit, minmax(220px, 1fr));
-  gap: 20px;
+  grid-template-columns: repeat(auto-fill, minmax(280px, 1fr));
+  gap: 1.5rem;
+  margin-bottom: 3rem;
 }
 
 .card {
-  background-color: #2d3340;
+  background: linear-gradient(135deg, #2d3340 0%, #3a4253 100%);
   border-radius: 12px;
-  padding: 20px;
-  box-shadow: 0 0 10px rgba(0, 0, 0, 0.2);
-  transition: background-color 0.2s ease;
+  padding: 1.5rem;
+  box-shadow: 0 10px 20px rgba(0, 0, 0, 0.1);
+  transition: transform 0.3s ease, box-shadow 0.3s ease;
+  display: flex;
+  flex-direction: column;
+  border: 1px solid rgba(255, 255, 255, 0.05);
 }
 
 .card:hover {
-  background-color: #343d4e;
+  transform: translateY(-5px);
+  box-shadow: 0 15px 30px rgba(0, 0, 0, 0.2);
+}
+
+.cardHeader {
+  display: flex;
+  align-items: center;
+  gap: 0.75rem;
+  margin-bottom: 1rem;
+}
+
+.cardIcon {
+  font-size: 1.8rem;
+  background: rgba(59, 214, 113, 0.1);
+  width: 48px;
+  height: 48px;
+  border-radius: 50%;
+  display: flex;
+  align-items: center;
+  justify-content: center;
 }
 
 .cardTitle {
-  font-size: 20px;
-  font-weight: bold;
-  color: #3bd671;
-  margin-bottom: 10px;
+  font-size: 1.2rem;
+  font-weight: 600;
+  margin: 0;
+  color: #fff;
 }
 
-.detail {
-  font-size: 15px;
-  color: white;
-  margin: 6px 0;
+.cardDetails {
+  flex-grow: 1;
+  margin-bottom: 1.5rem;
+}
+
+.detailItem {
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+  margin-bottom: 0.5rem;
+  color: rgba(255, 255, 255, 0.8);
+  font-size: 0.95rem;
+}
+
+.detailIcon {
+  color: #3bd671;
+  font-size: 1rem;
+}
+
+.cardDescription {
+  margin-top: 1rem;
+  color: rgba(255, 255, 255, 0.6);
+  font-size: 0.9rem;
+  line-height: 1.5;
+}
+
+.cardButton {
+  background: rgba(59, 214, 113, 0.1);
+  color: #3bd671;
+  border: 1px solid rgba(59, 214, 113, 0.3);
+  border-radius: 6px;
+  padding: 0.75rem 1rem;
+  font-weight: 600;
+  cursor: pointer;
+  transition: all 0.3s ease;
+  text-align: center;
+  margin-top: auto;
+}
+
+.cardButton:hover {
+  background: rgba(59, 214, 113, 0.2);
+  transform: translateY(-2px);
+}
+
+/* Analytics Section */
+.analyticsContainer {
+  margin-top: 1rem;
+}
+
+.statsGrid {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+  gap: 1.5rem;
+  margin-bottom: 2rem;
+}
+
+.statCard {
+  background: linear-gradient(135deg, #2d3340 0%, #3a4253 100%);
+  border-radius: 12px;
+  padding: 1.5rem;
+  box-shadow: 0 5px 15px rgba(0, 0, 0, 0.1);
+  border: 1px solid rgba(255, 255, 255, 0.05);
+}
+
+.statHeader {
+  display: flex;
+  align-items: center;
+  gap: 0.75rem;
+  margin-bottom: 1rem;
+}
+
+.statIcon {
+  font-size: 1.5rem;
+  color: #3bd671;
+}
+
+.statCard h4 {
+  margin: 0;
+  font-size: 1rem;
+  font-weight: 600;
+  color: rgba(255, 255, 255, 0.8);
+}
+
+.statValue {
+  font-size: 2rem;
+  font-weight: 700;
+  color: #fff;
+}
+
+/* Distribution Section */
+.distributionSection {
+  background: linear-gradient(135deg, #2d3340 0%, #3a4253 100%);
+  padding: 1.5rem;
+  border-radius: 12px;
+  box-shadow: 0 5px 15px rgba(0, 0, 0, 0.1);
+  border: 1px solid rgba(255, 255, 255, 0.05);
+}
+
+.sectionHeader {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-bottom: 1.5rem;
+}
+
+.sectionTitle {
+  display: flex;
+  align-items: center;
+  gap: 0.75rem;
+  font-size: 1.25rem;
+  font-weight: 600;
+  margin: 0;
+  color: #fff;
+}
+
+.sectionIcon {
+  color: #3bd671;
+  font-size: 1.5rem;
+}
+
+.legend {
+  display: flex;
+  gap: 1.5rem;
+}
+
+.legendItem {
+  font-size: 0.85rem;
+  color: rgba(255, 255, 255, 0.6);
+}
+
+.distributionList {
+  list-style: none;
+  padding: 0;
+  margin: 0;
+}
+
+.distributionItem {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  padding: 1rem 0;
+  border-bottom: 1px solid rgba(255, 255, 255, 0.05);
+}
+
+.distributionItem:last-child {
+  border-bottom: none;
+}
+
+.distributionInfo {
+  flex-grow: 1;
+  margin-right: 1rem;
+}
+
+.distributionName {
+  display: block;
+  margin-bottom: 0.5rem;
+  font-weight: 500;
+  color: #fff;
+}
+
+.distributionBarContainer {
+  width: 100%;
+  height: 8px;
+  background: rgba(255, 255, 255, 0.1);
+  border-radius: 4px;
+  overflow: hidden;
+}
+
+.distributionBar {
+  height: 100%;
+  background: linear-gradient(90deg, #3bd671 0%, #2bff88 100%);
+  border-radius: 4px;
+  transition: width 0.5s ease;
+}
+
+.distributionValues {
+  display: flex;
+  gap: 1.5rem;
+  min-width: 120px;
+  justify-content: flex-end;
+}
+
+.distributionCount {
+  font-weight: 600;
+  color: #fff;
+  min-width: 40px;
+  text-align: right;
+}
+
+.distributionPercentage {
+  font-weight: 600;
+  color: #3bd671;
+  min-width: 40px;
+  text-align: right;
 }

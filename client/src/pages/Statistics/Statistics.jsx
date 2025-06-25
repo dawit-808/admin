@@ -2,7 +2,7 @@ import { useEffect, useState } from "react";
 import axios from "axios";
 import styles from "./Statistics.module.css";
 
-export default function Statistics() {
+function Statistics() {
   const [stats, setStats] = useState(null);
 
   useEffect(() => {
@@ -38,18 +38,8 @@ export default function Statistics() {
           <h3 className={styles.cardValue}>{stats.pendingPayments}</h3>
         </div>
       </div>
-
-      <div className={styles.trainingDistribution}>
-        <h3 className={styles.sectionTitle}>🏋️ Training Type Distribution</h3>
-        <ul className={styles.distributionList}>
-          {stats.trainingTypeDistribution.map((type) => (
-            <li key={type.training_type} className={styles.distributionItem}>
-              <span>{type.training_type}</span>
-              <strong>{type.count}</strong>
-            </li>
-          ))}
-        </ul>
-      </div>
     </div>
   );
 }
+
+export default Statistics;

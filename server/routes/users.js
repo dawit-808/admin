@@ -103,6 +103,7 @@ router.get("/:id", async (req, res) => {
     const [rows] = await pool.query(
       `
       SELECT 
+        u.profile_img_url,
         u.id,
         u.member_code,
         u.name,
