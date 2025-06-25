@@ -11,10 +11,31 @@ async function generateMemberCode() {
   return `GYM${String(count).padStart(3, "0")}`;
 }
 
-// GET all users with training details
+// GET users with pagination + search
 router.get("/", async (req, res) => {
+  const page = parseInt(req.query.page) || 1;
+  const limit = parseInt(req.query.limit) || 10;
+  const search = req.query.search || "";
+  const offset = (page - 1) * limit;
+
   try {
-    const [rows] = await pool.query(`
+    // Filter condition
+    const searchSQL = `%${search}%`;
+
+    // Get total count with search
+    const [[{ total }]] = await pool.query(
+      `
+      SELECT COUNT(*) AS total
+      FROM users u
+      JOIN training_types t ON u.training_type_id = t.id
+      WHERE u.name LIKE ? OR u.member_code LIKE ?
+      `,
+      [searchSQL, searchSQL]
+    );
+
+    // Get paginated results with search
+    const [rows] = await pool.query(
+      `
       SELECT 
         u.id,
         u.member_code,
@@ -25,10 +46,21 @@ router.get("/", async (req, res) => {
         t.training_schedule
       FROM users u
       JOIN training_types t ON u.training_type_id = t.id
-    `);
-    res.json(rows);
+      WHERE u.name LIKE ? OR u.member_code LIKE ?
+      ORDER BY u.created_at DESC
+      LIMIT ? OFFSET ?
+      `,
+      [searchSQL, searchSQL, limit, offset]
+    );
+
+    res.json({
+      users: rows,
+      total,
+      page,
+      totalPages: Math.ceil(total / limit),
+    });
   } catch (err) {
-    console.error(err);
+    console.error("Error fetching users:", err);
     res.status(500).json({ error: "Server error" });
   }
 });

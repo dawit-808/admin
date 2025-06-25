@@ -2,8 +2,6 @@ import { BrowserRouter as Router, Routes, Route } from "react-router-dom";
 import DashboardLayout from "./components/layout/DashboardLayout";
 import Admin from "./pages/Admin/Admin";
 import MemberDetails from "./pages/MemberDetails/MemberDetails";
-import TrainingType from "./pages/TrainingType/TrainingType";
-import Statistics from "./pages/Statistics/Statistics";
 import Auth from "./pages/Auth/Auth";
 import PrivateRoute from "./components/PrivateRoute/PrivateRoute";
 import RegisterMember from "./pages/RegisterMember/RegisterMember";
@@ -32,26 +30,6 @@ function App() {
             <PrivateRoute>
               <DashboardLayout>
                 <MemberDetails />
-              </DashboardLayout>
-            </PrivateRoute>
-          }
-        />
-        <Route
-          path="/training-types"
-          element={
-            <PrivateRoute>
-              <DashboardLayout>
-                <TrainingType />
-              </DashboardLayout>
-            </PrivateRoute>
-          }
-        />
-        <Route
-          path="/statistics"
-          element={
-            <PrivateRoute>
-              <DashboardLayout>
-                <Statistics />
               </DashboardLayout>
             </PrivateRoute>
           }

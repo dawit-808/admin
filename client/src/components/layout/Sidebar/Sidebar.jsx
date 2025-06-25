@@ -1,8 +1,6 @@
 import { Link } from "react-router-dom";
 import { Tooltip } from "@mui/material";
 import ArticleIcon from "@mui/icons-material/Article";
-import DirectionsRunIcon from "@mui/icons-material/DirectionsRun";
-import BarChartIcon from "@mui/icons-material/BarChart";
 import PersonAddIcon from "@mui/icons-material/PersonAdd";
 import LogoutIcon from "@mui/icons-material/Logout";
 import classes from "./Sidebar.module.css";
@@ -23,22 +21,6 @@ function Sidebar() {
             <Tooltip title="Members" placement="right">
               <Link to="/">
                 <ArticleIcon className={classes.icon} />
-              </Link>
-            </Tooltip>
-          </li>
-
-          <li>
-            <Tooltip title="Training Types" placement="right">
-              <Link to="/training-types">
-                <DirectionsRunIcon className={classes.icon} />
-              </Link>
-            </Tooltip>
-          </li>
-
-          <li>
-            <Tooltip title="Statistics" placement="right">
-              <Link to="/statistics">
-                <BarChartIcon className={classes.icon} />
               </Link>
             </Tooltip>
           </li>
