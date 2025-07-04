@@ -11,8 +11,8 @@ function Dashboard() {
       <Sidebar />
 
       {/* Push content right and down */}
-      <div className="p-16">
-        <main className="p-6 min-h-[calc(100vh-64px)] flex flex-col justify-between">
+      <div className="pl-16 pt-16">
+        <main className=" min-h-[calc(100vh-64px)] flex flex-col justify-between">
           <MembersTable />
           <Footer />
         </main>

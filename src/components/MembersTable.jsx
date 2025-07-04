@@ -33,7 +33,7 @@ function MembersTable() {
       <div className="rounded shadow p-4 max-w-full overflow-x-auto bg-[#0D1421] text-white">
         {/* Header */}
         <div className="mb-4 flex justify-between items-center">
-          <h2 className="text-lg font-semibold">Members</h2>
+          <h2 className="text-lg text-blue-500 font-semibold">Members</h2>
           <div className="flex items-center bg-gray-800 border border-gray-600 rounded-full px-4">
             <SearchIcon className="text-blue-500" />
             <input
@@ -117,7 +117,7 @@ function MembersTable() {
         </table>
 
         {/* Pagination */}
-        <div className="mt-4 flex justify-end">
+        <div className="mt-4 flex justify-center">
           <Pagination
             count={totalPages}
             page={page}
