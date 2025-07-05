@@ -1,7 +1,7 @@
 import React, { useState, useEffect } from "react";
 import SearchIcon from "@mui/icons-material/Search";
 import Pagination from "@mui/material/Pagination";
-import { sampleMembers } from "./SampleMembers";
+import { sampleMembers } from "./sampleMembers";
 import { createTheme, ThemeProvider } from "@mui/material/styles";
 
 const theme = createTheme({
