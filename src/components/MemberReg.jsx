@@ -35,14 +35,14 @@ function MemberReg() {
   };
 
   return (
-    <div className="min-h-screen bg-black flex flex-col items-center p-6 text-gray-100">
+    <div className="min-h-screen bg-[#0D1421] flex flex-col items-center p-6 text-gray-100">
       <h1 className="md:text-3xl text-blue-500 font-semibold mb-6">
         Register New Member
       </h1>
 
       <form
         onSubmit={handleSubmit}
-        className="bg-[#10141E] rounded-lg shadow-lg p-6 max-w-4xl w-full flex flex-col md:flex-row gap-8"
+        className="bg-[#222531] rounded-lg shadow-lg p-6 max-w-4xl w-full flex flex-col md:flex-row gap-8"
       >
         {/* Capture Section */}
         <div className="flex flex-col items-center md:w-1/3">
@@ -66,7 +66,7 @@ function MemberReg() {
             value={formData.name}
             onChange={handleChange}
             required
-            className="p-3 rounded-md bg-black border border-gray-600 focus:border-blue-500 outline-none placeholder-gray-400"
+            className="p-3 rounded-md bg-[#0D1421] border border-gray-600 focus:border-blue-500 outline-none placeholder-gray-400"
           />
 
           <select
@@ -74,7 +74,7 @@ function MemberReg() {
             value={formData.trainingType}
             onChange={handleChange}
             required
-            className="p-3 rounded-md bg-black border border-gray-600 focus:border-blue-500 outline-none text-gray-100"
+            className="p-3 rounded-md bg-[#0D1421] border border-gray-600 focus:border-blue-500 outline-none text-gray-100"
           >
             <option value="" disabled>
               Select Training Type
@@ -89,7 +89,7 @@ function MemberReg() {
             value={formData.trainingSchedule}
             onChange={handleChange}
             required
-            className="p-3 rounded-md bg-black border border-gray-600 focus:border-blue-500 outline-none text-gray-100"
+            className="p-3 rounded-md bg-[#0D1421] border border-gray-600 focus:border-blue-500 outline-none text-gray-100"
           >
             <option value="" disabled>
               Select Training Schedule

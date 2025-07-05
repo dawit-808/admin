@@ -21,9 +21,9 @@ function MembersTable() {
     setMembers(sampleMembers);
   }, []);
 
-  const filtered = members.filter((m) =>
-    m.name.toLowerCase().includes(search.toLowerCase())
-  );
+  const filtered = members
+    .filter((m) => m.name.toLowerCase().includes(search.toLowerCase()))
+    .sort((a, b) => a.name.localeCompare(b.name));
 
   const paginated = filtered.slice((page - 1) * pageSize, page * pageSize);
   const totalPages = Math.ceil(filtered.length / pageSize);

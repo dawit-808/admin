@@ -1,6 +1,6 @@
 import React from "react";
 import { Link } from "react-router-dom";
-import AccountCircleIcon from "@mui/icons-material/AccountCircle";
+import DarkModeIcon from "@mui/icons-material/DarkMode";
 
 function Navbar() {
   return (
@@ -12,7 +12,7 @@ function Navbar() {
 
       {/* Right: User Icon */}
       <div className="cursor-pointer">
-        <AccountCircleIcon fontSize="large" />
+        <DarkModeIcon fontSize="medium" />
       </div>
     </div>
   );
