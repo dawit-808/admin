@@ -34,7 +34,7 @@ function MembersTable() {
         {/* Header */}
         <div className="mb-4 flex justify-between items-center">
           <h2 className="text-lg text-blue-500 font-semibold">Members</h2>
-          <div className="flex items-center bg-gray-800 border border-gray-600 rounded-full px-4">
+          <div className="flex items-center bg-gray-800 border border-gray-600 rounded-full px-4 hover:border-blue-500 focus-within:border-blue-500 transition-colors duration-200">
             <SearchIcon className="text-blue-500" />
             <input
               type="text"
@@ -50,23 +50,15 @@ function MembersTable() {
         </div>
 
         {/* Table */}
-        <table className="min-w-full table-auto border-collapse border border-gray-600 text-sm">
-          <thead className="bg-[#1A2332] text-gray-300">
+        <table className="min-w-full text-sm">
+          <thead className="text-gray-400 border-b border-gray-600">
             <tr>
-              <th className="border border-gray-600 px-4 py-2 text-left">#</th>
-              <th className="border border-gray-600 px-4 py-2 text-left">Id</th>
-              <th className="border border-gray-600 px-4 py-2 text-left">
-                Name
-              </th>
-              <th className="border border-gray-600 px-4 py-2 text-left">
-                Training
-              </th>
-              <th className="border border-gray-600 px-4 py-2 text-left">
-                Status
-              </th>
-              <th className="border border-gray-600 px-4 py-2 text-left">
-                Actions
-              </th>
+              <th className="px-4 py-2 text-left">#</th>
+              <th className="px-4 py-2 text-left">Id</th>
+              <th className="px-4 py-2 text-left">Name</th>
+              <th className="px-4 py-2 text-left">Training</th>
+              <th className="px-4 py-2 text-left">Status</th>
+              <th className="px-4 py-2 text-left">Actions</th>
             </tr>
           </thead>
           <tbody>
@@ -78,20 +70,17 @@ function MembersTable() {
               </tr>
             ) : (
               paginated.map((member, index) => (
-                <tr key={member.id} className="hover:bg-[#1f2937]">
-                  <td className="border border-gray-700 px-4 py-2">
+                <tr
+                  key={member.id}
+                  className="border-b border-gray-700 hover:bg-[#1f2937] transition"
+                >
+                  <td className="px-4 py-2">
                     {(page - 1) * pageSize + index + 1}
                   </td>
-                  <td className="border border-gray-700 px-4 py-2">
-                    {member.id}
-                  </td>
-                  <td className="border border-gray-700 px-4 py-2">
-                    {member.name}
-                  </td>
-                  <td className="border border-gray-700 px-4 py-2">
-                    {member.training}
-                  </td>
-                  <td className="border border-gray-700 px-4 py-2">
+                  <td className="px-4 py-2">{member.id}</td>
+                  <td className="px-4 py-2">{member.name}</td>
+                  <td className="px-4 py-2">{member.training}</td>
+                  <td className="px-4 py-2">
                     <span
                       className={`inline-block px-2 py-1 rounded text-xs font-semibold ${
                         member.status === "Active"
@@ -102,7 +91,7 @@ function MembersTable() {
                       {member.status}
                     </span>
                   </td>
-                  <td className="border border-gray-700 px-4 py-2 space-x-2">
+                  <td className="px-4 py-2 space-x-2">
                     <button className="text-blue-400 hover:underline">
                       Edit
                     </button>
