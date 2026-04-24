@@ -6,8 +6,8 @@ import { createTheme, ThemeProvider } from "@mui/material/styles";
 
 const theme = createTheme({
   palette: {
-    primary: { main: "#3B82F6" }, // Tailwind blue-500
-    text: { primary: "#E5E7EB" }, // Tailwind gray-200 for dark mode
+    primary: { main: "#3B82F6" },
+    text: { primary: "#E5E7EB" },
   },
 });
 
