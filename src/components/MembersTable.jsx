@@ -1,147 +1,191 @@
-import React, { useState, useEffect } from "react";
+import React, { useState, useMemo } from "react";
 import SearchIcon from "@mui/icons-material/Search";
 import Pagination from "@mui/material/Pagination";
-import { sampleMembers } from "./sampleMembers";
-import { createTheme, ThemeProvider } from "@mui/material/styles";
+import MoreVertIcon from "@mui/icons-material/MoreVert";
 
-const theme = createTheme({
-  palette: {
-    primary: { main: "#3B82F6" },
-    text: { primary: "#E5E7EB" },
-  },
-});
-
-function MembersTable() {
-  const [members, setMembers] = useState([]);
+/**
+ * Refactored MembersTable
+ * @param {Array} members - The array of member objects from the API
+ * @param {boolean} loading - Loading state
+ * @param {number} page - Current active page
+ * @param {function} setPage - State setter for page
+ * @param {number} totalPages - Total pages from backend
+ * @param {number} limit - Items per page
+ */
+function MembersTable({
+  members = [],
+  loading,
+  page,
+  setPage,
+  totalPages,
+  limit,
+}) {
   const [search, setSearch] = useState("");
-  const [page, setPage] = useState(1);
-  const pageSize = 10;
 
-  useEffect(() => {
-    setMembers(sampleMembers);
-  }, []);
+  // Memoize filtering to prevent recalculation on unrelated re-renders
+  // Note: For large datasets, searching should happen on the server-side.
+  const filteredMembers = useMemo(() => {
+    if (!search) return members;
+    return members.filter(
+      (m) =>
+        (m.name || "").toLowerCase().includes(search.toLowerCase()) ||
+        (m.ras_id || "").toLowerCase().includes(search.toLowerCase()),
+    );
+  }, [members, search]);
 
-  const filtered = members
-    .filter((m) => m.fullName.toLowerCase().includes(search.toLowerCase()))
-    .sort((a, b) => a.fullName.localeCompare(b.fullName));
-
-  const paginated = filtered.slice((page - 1) * pageSize, page * pageSize);
-  const totalPages = Math.ceil(filtered.length / pageSize);
+  if (loading) {
+    return (
+      <div className="flex flex-col justify-center items-center h-64 space-y-4">
+        <div className="animate-spin rounded-full h-10 w-10 border-t-2 border-b-2 border-blue-500"></div>
+        <p className="text-gray-500 text-sm animate-pulse">
+          Loading members...
+        </p>
+      </div>
+    );
+  }
 
   return (
-    <ThemeProvider theme={theme}>
-      <div className="rounded shadow p-4 bg-[#0D1421] text-white">
-        {/* Header */}
-        <div className="mb-4 flex justify-between items-center">
-          <h2 className="text-lg text-blue-500 font-semibold">Members</h2>
-          <div className="flex items-center bg-gray-800 border border-gray-600 rounded-full px-4 hover:border-blue-500 focus-within:border-blue-500 transition-colors duration-200">
-            <SearchIcon className="text-blue-500" />
-            <input
-              type="text"
-              placeholder="Search..."
-              value={search}
-              onChange={(e) => {
-                setSearch(e.target.value);
-                setPage(1);
-              }}
-              className="w-full pl-3 py-2 text-sm text-white bg-transparent focus:outline-none"
+    <div className="bg-[#111827] border border-gray-800 rounded-xl overflow-hidden shadow-2xl">
+      {/* HEADER SECTION */}
+      <div className="px-6 py-5 border-b border-gray-800 flex flex-col md:flex-row md:items-center justify-between gap-4">
+        <div>
+          <h2 className="text-xl font-bold text-white tracking-tight">
+            Active Members
+          </h2>
+          <p className="text-sm text-gray-400 mt-1">
+            Manage and monitor your community list
+          </p>
+        </div>
+
+        <div className="relative group">
+          <div className="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none">
+            <SearchIcon
+              className="text-gray-500 group-focus-within:text-blue-500 transition-colors"
+              fontSize="small"
             />
           </div>
-        </div>
-
-        {/* Table */}
-        <div className="overflow-x-auto">
-          <table className="w-full table-auto border-collapse border border-gray-700 rounded-lg overflow-hidden shadow-md">
-            <thead className="bg-[#1A2233] text-gray-300 text-sm uppercase">
-              <tr>
-                <th className="px-4 py-2 border-b border-gray-600">#</th>
-                <th className="px-4 py-2 border-b border-gray-600 text-left">
-                  Name
-                </th>
-                <th className="px-4 py-2 border-b border-gray-600 text-left">
-                  Phone
-                </th>
-                <th className="px-4 py-2 border-b border-gray-600 text-left">
-                  Type
-                </th>
-                <th className="px-4 py-2 border-b border-gray-600 text-left">
-                  Schedule
-                </th>
-                <th className="px-4 py-2 border-b border-gray-600 text-left">
-                  Package
-                </th>
-                <th className="px-4 py-2 border-b border-gray-600 text-center">
-                  Paid
-                </th>
-                <th className="px-4 py-2 border-b border-gray-600 text-center">
-                  Expires
-                </th>
-                <th className="px-4 py-2 border-b border-gray-600 text-center">
-                  Actions
-                </th>
-              </tr>
-            </thead>
-            <tbody className="text-sm">
-              {paginated.map((member, index) => (
-                <tr key={member.id || index} className="hover:bg-[#1F2A40]">
-                  <td className="px-4 py-2 border-b border-gray-700 text-center">
-                    {(page - 1) * pageSize + index + 1}
-                  </td>
-                  <td className="px-4 py-2 border-b border-gray-700">
-                    {member.fullName}
-                  </td>
-                  <td className="px-4 py-2 border-b border-gray-700">
-                    {member.phoneNumber}
-                  </td>
-                  <td className="px-4 py-2 border-b border-gray-700">
-                    {member.trainingType}
-                  </td>
-                  <td className="px-4 py-2 border-b border-gray-700">
-                    {member.trainingSchedule}
-                  </td>
-                  <td className="px-4 py-2 border-b border-gray-700">
-                    {member.membershipPackage}
-                  </td>
-                  <td className="px-4 py-2 border-b border-gray-700 text-center">
-                    <span
-                      className={`px-2 py-1 rounded text-white text-xs font-semibold ${
-                        member.paymentStatus === "Paid"
-                          ? "bg-green-500"
-                          : "bg-red-500"
-                      }`}
-                    >
-                      {member.paymentStatus}
-                    </span>
-                  </td>
-                  <td className="px-4 py-2 border-b border-gray-700 text-center">
-                    {member.membershipExpiryDate}
-                  </td>
-                  <td className="px-4 py-2 border-b border-gray-700 text-center space-x-2">
-                    <button className="text-blue-400 hover:underline">
-                      Edit
-                    </button>
-                    <button className="text-red-400 hover:underline">
-                      Delete
-                    </button>
-                  </td>
-                </tr>
-              ))}
-            </tbody>
-          </table>
-        </div>
-
-        {/* Pagination */}
-        <div className="mt-4 flex justify-center">
-          <Pagination
-            count={totalPages}
-            page={page}
-            onChange={(e, value) => setPage(value)}
-            color="primary"
+          <input
+            type="text"
+            placeholder="Search name or ID..."
+            value={search}
+            onChange={(e) => setSearch(e.target.value)}
+            className="block w-full md:w-72 pl-10 pr-3 py-2 bg-[#1F2937] border border-gray-700 rounded-lg text-sm text-white placeholder-gray-500 focus:outline-none focus:ring-2 focus:ring-blue-600 focus:border-transparent transition-all hover:border-gray-600"
           />
         </div>
       </div>
-    </ThemeProvider>
+
+      {/* TABLE SECTION */}
+      <div className="overflow-x-auto">
+        <table className="w-full text-left border-collapse">
+          <thead>
+            <tr className="bg-[#1F2937]/50 text-gray-400 uppercase text-[11px] font-bold tracking-wider">
+              <th className="px-6 py-4">#</th>
+              <th className="px-6 py-4">Member Info</th>
+              <th className="px-6 py-4">Ras ID</th>
+              <th className="px-6 py-4">Gender</th>
+              <th className="px-6 py-4 text-center">Status</th>
+              <th className="px-6 py-4 text-right">Action</th>
+            </tr>
+          </thead>
+          <tbody className="divide-y divide-gray-800">
+            {filteredMembers.length > 0 ? (
+              filteredMembers.map((m, i) => (
+                <tr
+                  key={m.id || i}
+                  className="hover:bg-[#1F2937]/30 transition-colors group"
+                >
+                  <td className="px-6 py-4 text-sm text-gray-500 font-mono">
+                    {((page - 1) * limit + i + 1).toString().padStart(2, "0")}
+                  </td>
+                  <td className="px-6 py-4">
+                    <div className="flex flex-col">
+                      <span className="text-sm font-semibold text-white group-hover:text-blue-400 transition-colors">
+                        {m.name}
+                      </span>
+                      <span className="text-xs text-gray-500">
+                        {m.phone || "No phone"}
+                      </span>
+                    </div>
+                  </td>
+                  <td className="px-6 py-4 text-sm font-mono text-blue-400/80">
+                    {m.ras_id}
+                  </td>
+                  <td className="px-6 py-4 text-sm text-gray-300 capitalize">
+                    {m.gender}
+                  </td>
+                  <td className="px-6 py-4 text-center">
+                    <StatusBadge paid={m.payment_status} />
+                  </td>
+                  <td className="px-6 py-4 text-right">
+                    <button
+                      className="p-1 rounded-md text-gray-500 hover:text-white hover:bg-gray-700 transition-all"
+                      aria-label="Actions"
+                    >
+                      <MoreVertIcon fontSize="small" />
+                    </button>
+                  </td>
+                </tr>
+              ))
+            ) : (
+              <tr>
+                <td
+                  colSpan="6"
+                  className="px-6 py-12 text-center text-gray-500 italic"
+                >
+                  No members found matching your search.
+                </td>
+              </tr>
+            )}
+          </tbody>
+        </table>
+      </div>
+
+      {/* FOOTER / PAGINATION */}
+      <div className="px-6 py-4 bg-[#111827] border-t border-gray-800 flex items-center justify-center">
+        <Pagination
+          count={totalPages}
+          page={page}
+          onChange={(_, value) => setPage(value)}
+          size="medium"
+          sx={{
+            "& .MuiPaginationItem-root": {
+              color: "#9CA3AF",
+              borderColor: "#374151",
+              "&:hover": {
+                backgroundColor: "#1F2937",
+              },
+            },
+            "& .Mui-selected": {
+              backgroundColor: "#2563EB !important",
+              color: "#fff",
+              fontWeight: "bold",
+            },
+            "& .MuiPaginationItem-ellipsis": { color: "#4B5563" },
+          }}
+          variant="outlined"
+          shape="rounded"
+        />
+      </div>
+    </div>
   );
 }
+
+// Sub-component for cleaner code
+const StatusBadge = ({ paid }) => {
+  const styles = paid
+    ? "bg-emerald-500/10 text-emerald-400 border-emerald-500/20"
+    : "bg-rose-500/10 text-rose-400 border-rose-500/20";
+
+  const dotStyles = paid ? "bg-emerald-400" : "bg-rose-400";
+
+  return (
+    <span
+      className={`inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium border ${styles}`}
+    >
+      <span className={`w-1.5 h-1.5 rounded-full mr-1.5 ${dotStyles}`} />
+      {paid ? "Paid" : "Unpaid"}
+    </span>
+  );
+};
 
 export default MembersTable;
