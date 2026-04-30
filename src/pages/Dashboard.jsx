@@ -24,7 +24,8 @@ function Dashboard() {
         headers: { Authorization: `Bearer ${accessToken}` },
       });
       setMembers(res.data.data);
-      setTotalPages(res.data.totalPages);
+      setMembers(res.data.data);
+      setTotalPages(res.data.pagination.totalPages);
       console.log(res);
     } catch (err) {
       console.error("Failed to fetch members:", err);
