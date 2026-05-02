@@ -17,6 +17,25 @@ function Dashboard() {
   const [totalPages, setTotalPages] = useState(1);
   const limit = 15;
 
+  const [stats, setStats] = useState({
+    totalMembers: 0,
+    paid: 0,
+  });
+  const fetchStats = async () => {
+    try {
+      const res = await api.get("/stats", {
+        headers: { Authorization: `Bearer ${accessToken}` },
+      });
+
+      setStats({
+        totalMembers: res.data.totalMembers,
+        paid: res.data.paid,
+      });
+    } catch (err) {
+      console.error("Failed to fetch stats:", err);
+    }
+  };
+
   const fetchMembers = async (pageNumber) => {
     try {
       setLoading(true);
@@ -36,7 +55,7 @@ function Dashboard() {
 
   useEffect(() => {
     fetchMembers(page);
-    console.log(members);
+    fetchStats();
   }, [page, accessToken]);
 
   return (
@@ -68,9 +87,9 @@ function Dashboard() {
           <div className="grid grid-cols-1 md:grid-cols-3 gap-px bg-white/[0.05] border border-white/[0.05] rounded-xl overflow-hidden">
             <StatCard
               title="Total Members"
-              value="1,284"
+              value={stats.totalMembers}
               icon={<GroupIcon sx={{ fontSize: 18 }} />}
-              subtext="+12% from last month"
+              subtext="All registered members"
             />
             <StatCard
               title="Monthly Revenue"
@@ -80,7 +99,7 @@ function Dashboard() {
             />
             <StatCard
               title="Active Now"
-              value="42"
+              value={stats.paid}
               icon={<RadarIcon sx={{ fontSize: 18 }} />}
               subtext="Real-time check-ins"
               isLive
