@@ -14,6 +14,8 @@ import AddCoach from "./pages/AddCoach";
 import Auth from "./pages/Auth";
 import RoleRoute from "./components/RoleRoute";
 import Statistics from "./pages/Statistics";
+import Coaches from "./pages/Coaches";
+import CoachProfile from "./pages/CoachProfile";
 
 function AppRoutes() {
   const { loading, authReady } = useContext(AuthContext);
@@ -68,6 +70,17 @@ function AppRoutes() {
           </RoleRoute>
         }
       />
+
+      <Route
+        path="/coaches"
+        element={
+          <RoleRoute allowedRoles={["admin"]}>
+            <Coaches />
+          </RoleRoute>
+        }
+      />
+
+      <Route path="/coaches/:id" element={<CoachProfile />} />
     </Routes>
   );
 }

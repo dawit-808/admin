@@ -5,7 +5,7 @@ import { AuthContext } from "../context/AuthContext";
 const RoleRoute = ({ children, allowedRoles }) => {
   const { accessToken, role, loading, authReady } = useContext(AuthContext);
 
-  // 🔥 wait until refresh finishes
+  //  wait until refresh finishes
   if (loading || !authReady) {
     return (
       <div className="min-h-screen bg-[#030712] flex flex-col items-center justify-center">
@@ -20,12 +20,12 @@ const RoleRoute = ({ children, allowedRoles }) => {
     );
   }
 
-  // 🔴 not logged in
+  //  not logged in
   if (!accessToken) {
     return <Navigate to="/login" replace />;
   }
 
-  // 🔴 role not ready yet (extra safety)
+  //  role not ready yet (extra safety)
   if (!role) {
     return (
       <div className="min-h-screen flex items-center justify-center text-white">
@@ -34,12 +34,12 @@ const RoleRoute = ({ children, allowedRoles }) => {
     );
   }
 
-  // 🔴 unauthorized role
+  //  unauthorized role
   if (!allowedRoles.includes(role)) {
     return <Navigate to="/login" replace />;
   }
 
-  // ✅ allowed
+  //  allowed
   return children;
 };
 

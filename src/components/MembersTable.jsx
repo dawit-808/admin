@@ -3,15 +3,6 @@ import SearchIcon from "@mui/icons-material/Search";
 import Pagination from "@mui/material/Pagination";
 import MoreVertIcon from "@mui/icons-material/MoreVert";
 
-/**
- * Refactored MembersTable
- * @param {Array} members - The array of member objects from the API
- * @param {boolean} loading - Loading state
- * @param {number} page - Current active page
- * @param {function} setPage - State setter for page
- * @param {number} totalPages - Total pages from backend
- * @param {number} limit - Items per page
- */
 function MembersTable({
   members = [],
   loading,
@@ -22,8 +13,6 @@ function MembersTable({
 }) {
   const [search, setSearch] = useState("");
 
-  // Memoize filtering to prevent recalculation on unrelated re-renders
-  // Note: For large datasets, searching should happen on the server-side.
   const filteredMembers = useMemo(() => {
     if (!search) return members;
     return members.filter(
@@ -33,43 +22,34 @@ function MembersTable({
     );
   }, [members, search]);
 
-  if (loading) {
-    return (
-      <div className="flex flex-col justify-center items-center h-64 space-y-4">
-        <div className="animate-spin rounded-full h-10 w-10 border-t-2 border-b-2 border-blue-500"></div>
-        <p className="text-gray-500 text-sm animate-pulse">
-          Loading members...
-        </p>
-      </div>
-    );
-  }
+  if (loading) return <TableSkeleton limit={limit} />;
 
   return (
-    <div className="bg-[#111827] border border-gray-800 rounded-xl overflow-hidden shadow-2xl">
+    <div className="bg-white dark:bg-[#09090b] border border-zinc-200 dark:border-white/[0.05] rounded-2xl overflow-hidden shadow-sm dark:shadow-2xl transition-all duration-300">
       {/* HEADER SECTION */}
-      <div className="px-6 py-5 border-b border-gray-800 flex flex-col md:flex-row md:items-center justify-between gap-4">
+      <div className="px-6 py-6 border-b border-zinc-100 dark:border-white/[0.05] flex flex-col md:flex-row md:items-center justify-between gap-4">
         <div>
-          <h2 className="text-xl font-bold text-white tracking-tight">
+          <h2 className="text-lg font-bold text-zinc-900 dark:text-white tracking-tight">
             Active Members
           </h2>
-          <p className="text-sm text-gray-400 mt-1">
-            Manage and monitor your community list
+          <p className="text-xs text-zinc-500 dark:text-zinc-500 mt-0.5 font-medium">
+            Reviewing {filteredMembers.length} community profiles
           </p>
         </div>
 
         <div className="relative group">
           <div className="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none">
             <SearchIcon
-              className="text-gray-500 group-focus-within:text-blue-500 transition-colors"
-              fontSize="small"
+              className="text-zinc-400 group-focus-within:text-indigo-500 transition-colors"
+              sx={{ fontSize: 18 }}
             />
           </div>
           <input
             type="text"
-            placeholder="Search name or ID..."
+            placeholder="Search directory..."
             value={search}
             onChange={(e) => setSearch(e.target.value)}
-            className="block w-full md:w-72 pl-10 pr-3 py-2 bg-[#1F2937] border border-gray-700 rounded-lg text-sm text-white placeholder-gray-500 focus:outline-none focus:ring-2 focus:ring-blue-600 focus:border-transparent transition-all hover:border-gray-600"
+            className="block w-full md:w-72 pl-10 pr-3 py-2.5 bg-zinc-50 dark:bg-black/20 border border-zinc-200 dark:border-white/[0.05] rounded-xl text-sm text-zinc-900 dark:text-white placeholder-zinc-400 focus:outline-none focus:ring-2 focus:ring-indigo-500/20 focus:border-indigo-500 transition-all shadow-sm dark:shadow-none"
           />
         </div>
       </div>
@@ -78,49 +58,48 @@ function MembersTable({
       <div className="overflow-x-auto">
         <table className="w-full text-left border-collapse">
           <thead>
-            <tr className="bg-[#1F2937]/50 text-gray-400 uppercase text-[11px] font-bold tracking-wider">
+            <tr className="bg-zinc-50/50 dark:bg-white/[0.02] text-zinc-500 dark:text-zinc-500 uppercase text-[10px] font-bold tracking-[0.15em]">
               <th className="px-6 py-4">#</th>
-              <th className="px-6 py-4">Member Info</th>
-              <th className="px-6 py-4">Ras ID</th>
+              <th className="px-6 py-4">Identity</th>
+              <th className="px-6 py-4">Registry ID</th>
               <th className="px-6 py-4">Gender</th>
-              <th className="px-6 py-4 text-center">Status</th>
-              <th className="px-6 py-4 text-right">Action</th>
+              <th className="px-6 py-4 text-center">Payment Status</th>
+              <th className="px-6 py-4 text-right pr-10">Action</th>
             </tr>
           </thead>
-          <tbody className="divide-y divide-gray-800">
+          <tbody className="divide-y divide-zinc-100 dark:divide-white/[0.05]">
             {filteredMembers.length > 0 ? (
               filteredMembers.map((m, i) => (
                 <tr
                   key={m.id || i}
-                  className="hover:bg-[#1F2937]/30 transition-colors group"
+                  className="hover:bg-zinc-50 dark:hover:bg-white/[0.01] transition-colors group cursor-default"
                 >
-                  <td className="px-6 py-4 text-sm text-gray-500 font-mono">
+                  <td className="px-6 py-5 text-[11px] text-zinc-400 font-mono">
                     {((page - 1) * limit + i + 1).toString().padStart(2, "0")}
                   </td>
-                  <td className="px-6 py-4">
+                  <td className="px-6 py-5">
                     <div className="flex flex-col">
-                      <span className="text-sm font-semibold text-white group-hover:text-blue-400 transition-colors">
+                      <span className="text-sm font-semibold text-zinc-900 dark:text-zinc-200 group-hover:text-indigo-600 dark:group-hover:text-indigo-400 transition-colors">
                         {m.name}
                       </span>
-                      <span className="text-xs text-gray-500">
-                        {m.phone || "No phone"}
+                      <span className="text-[11px] text-zinc-400 font-medium mt-0.5">
+                        {m.phone || "No contact"}
                       </span>
                     </div>
                   </td>
-                  <td className="px-6 py-4 text-sm font-mono text-blue-400/80">
-                    {m.ras_id}
+                  <td className="px-6 py-5">
+                    <span className="px-2 py-1 rounded-md bg-zinc-100 dark:bg-zinc-800 text-zinc-600 dark:text-zinc-400 text-[11px] font-mono font-bold tracking-tight">
+                      {m.ras_id}
+                    </span>
                   </td>
-                  <td className="px-6 py-4 text-sm text-gray-300 capitalize">
+                  <td className="px-6 py-5 text-xs text-zinc-500 font-medium">
                     {m.gender}
                   </td>
-                  <td className="px-6 py-4 text-center">
+                  <td className="px-6 py-5 text-center">
                     <StatusBadge paid={m.payment_status} />
                   </td>
-                  <td className="px-6 py-4 text-right">
-                    <button
-                      className="p-1 rounded-md text-gray-500 hover:text-white hover:bg-gray-700 transition-all"
-                      aria-label="Actions"
-                    >
+                  <td className="px-6 py-5 text-right pr-10">
+                    <button className="p-2 rounded-lg text-zinc-400 hover:text-zinc-900 dark:hover:text-white hover:bg-zinc-100 dark:hover:bg-white/10 transition-all">
                       <MoreVertIcon fontSize="small" />
                     </button>
                   </td>
@@ -130,9 +109,9 @@ function MembersTable({
               <tr>
                 <td
                   colSpan="6"
-                  className="px-6 py-12 text-center text-gray-500 italic"
+                  className="px-6 py-20 text-center text-zinc-400 italic text-sm"
                 >
-                  No members found matching your search.
+                  No results found matching your criteria.
                 </td>
               </tr>
             )}
@@ -141,51 +120,62 @@ function MembersTable({
       </div>
 
       {/* FOOTER / PAGINATION */}
-      <div className="px-6 py-4 bg-[#111827] border-t border-gray-800 flex items-center justify-center">
+      <div className="px-6 py-5 bg-zinc-50/50 dark:bg-[#09090b] border-t border-zinc-100 dark:border-white/[0.05] flex items-center justify-center">
         <Pagination
           count={totalPages}
           page={page}
           onChange={(_, value) => setPage(value)}
-          size="medium"
+          size="small"
           sx={{
             "& .MuiPaginationItem-root": {
-              color: "#9CA3AF",
-              borderColor: "#374151",
+              color: "rgb(161 161 170)", // zinc-400
+              borderColor: "transparent",
+              fontSize: "0.75rem",
+              fontWeight: 600,
+              borderRadius: "8px",
               "&:hover": {
-                backgroundColor: "#1F2937",
+                backgroundColor: "rgba(0,0,0,0.05)",
               },
             },
             "& .Mui-selected": {
-              backgroundColor: "#2563EB !important",
-              color: "#fff",
-              fontWeight: "bold",
+              backgroundColor: "rgb(79 70 229) !important", // indigo-600
+              color: "#fff !important",
             },
-            "& .MuiPaginationItem-ellipsis": { color: "#4B5563" },
           }}
-          variant="outlined"
-          shape="rounded"
         />
       </div>
     </div>
   );
 }
 
-// Sub-component for cleaner code
 const StatusBadge = ({ paid }) => {
   const styles = paid
-    ? "bg-emerald-500/10 text-emerald-400 border-emerald-500/20"
-    : "bg-rose-500/10 text-rose-400 border-rose-500/20";
-
-  const dotStyles = paid ? "bg-emerald-400" : "bg-rose-400";
+    ? "bg-emerald-50 dark:bg-emerald-500/10 text-emerald-600 dark:text-emerald-400 border-emerald-100 dark:border-emerald-500/20"
+    : "bg-rose-50 dark:bg-rose-500/10 text-rose-600 dark:text-rose-400 border-rose-100 dark:border-rose-500/20";
 
   return (
     <span
-      className={`inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium border ${styles}`}
+      className={`inline-flex items-center px-3 py-1 rounded-full text-[10px] font-bold uppercase tracking-wider border ${styles}`}
     >
-      <span className={`w-1.5 h-1.5 rounded-full mr-1.5 ${dotStyles}`} />
+      <span
+        className={`w-1 h-1 rounded-full mr-2 ${paid ? "bg-emerald-500" : "bg-rose-500"}`}
+      />
       {paid ? "Paid" : "Unpaid"}
     </span>
   );
 };
+
+// Modern Skeleton Loader
+const TableSkeleton = ({ limit }) => (
+  <div className="w-full bg-white dark:bg-[#09090b] rounded-2xl border border-zinc-200 dark:border-white/[0.05] animate-pulse overflow-hidden">
+    <div className="h-20 border-b border-zinc-100 dark:border-white/[0.05]" />
+    {[...Array(limit)].map((_, i) => (
+      <div
+        key={i}
+        className="h-16 border-b border-zinc-50 dark:border-white/[0.02]"
+      />
+    ))}
+  </div>
+);
 
 export default MembersTable;
