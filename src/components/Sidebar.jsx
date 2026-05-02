@@ -32,19 +32,19 @@ const Sidebar = () => {
           isActive={location.pathname === "/"}
         />
         <NavItem
-          path="/analytics"
+          path="/statistics"
           icon={BarChart}
-          label="Insights"
-          isActive={location.pathname === "/analytics"}
+          label="statistics"
+          isActive={location.pathname === "/statistic"}
         />
 
         <div className="h-px w-8 bg-white/10 mx-auto my-2" />
 
         <NavItem
-          path="/members"
+          path="/coaches"
           icon={People}
-          label="Members"
-          isActive={location.pathname === "/members"}
+          label="Coaches"
+          isActive={location.pathname === "/coaches"}
         />
         <NavItem
           path="/schedules"
