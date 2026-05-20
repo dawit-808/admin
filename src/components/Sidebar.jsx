@@ -6,25 +6,26 @@ import {
   Sports,
   EventNote,
   BarChart,
-  Settings,
   Logout,
-  AddBox,
-  HealthAndSafety,
+  HowToReg,
+  AddCircleOutline,
+  PersonAdd,
 } from "@mui/icons-material";
 
 const Sidebar = () => {
   const location = useLocation();
 
   return (
-    <aside className="fixed left-0 top-0 h-screen w-20 flex flex-col items-center py-6 bg-[#09090b] border-r border-white/10 z-[100]">
-      {/* Brand Icon */}
-      <div className="mb-10 flex items-center justify-center">
-        <div className="w-12 h-12 rounded-2xl bg-gradient-to-br from-blue-600 to-indigo-700 flex items-center justify-center shadow-lg shadow-blue-900/20">
-          <Sports className="text-white" />
+    <aside className="fixed left-0 top-0 h-screen w-16 flex flex-col items-center py-6 bg-[#09090b] border-r border-zinc-800/50 z-[100]">
+      {/* Brand Icon - Minimalist */}
+      <div className="mb-8">
+        <div className="w-8 h-8 rounded-lg bg-blue-600 flex items-center justify-center shadow-lg shadow-blue-900/20">
+          <Sports className="text-white !text-[18px]" />
         </div>
       </div>
 
-      <div className="flex-1 flex flex-col gap-6">
+      {/* Main Nav Stack - All items share equal vertical spacing */}
+      <div className="flex flex-col gap-4 items-center w-full">
         <NavItem
           path="/"
           icon={SpaceDashboard}
@@ -34,16 +35,14 @@ const Sidebar = () => {
         <NavItem
           path="/statistics"
           icon={BarChart}
-          label="statistics"
-          isActive={location.pathname === "/statistic"}
+          label="Stats"
+          isActive={location.pathname === "/statistics"}
         />
-
-        <div className="h-px w-8 bg-white/10 mx-auto my-2" />
 
         <NavItem
           path="/coaches"
           icon={People}
-          label="Coaches"
+          label="Staff"
           isActive={location.pathname === "/coaches"}
         />
         <NavItem
@@ -53,101 +52,116 @@ const Sidebar = () => {
           isActive={location.pathname === "/schedules"}
         />
 
-        {/* The Action Menu */}
-        <QuickAction />
+        {/* Action Items - Integrated into the same flow */}
+        <ActionItem
+          icon={HowToReg}
+          label="Register"
+          header="Registration"
+          items={[
+            {
+              label: "New Member",
+              path: "/register/member",
+              icon: <PersonAdd className="!text-[16px]" />,
+            },
+            {
+              label: "New Coach",
+              path: "/register/coach",
+              icon: <Sports className="!text-[16px]" />,
+            },
+          ]}
+        />
+
+        <ActionItem
+          icon={AddCircleOutline}
+          label="Quick Add"
+          header="Actions"
+          items={[
+            {
+              label: "Add Member",
+              path: "/add-member",
+              icon: <People className="!text-[16px]" />,
+            },
+            {
+              label: "Add Schedule",
+              path: "/add-schedule",
+              icon: <EventNote className="!text-[16px]" />,
+            },
+          ]}
+        />
       </div>
 
-      <div className="mt-auto flex flex-col gap-4 border-t border-white/5 pt-6">
-        <NavItem
-          path="/settings"
-          icon={Settings}
-          label="Settings"
-          isActive={location.pathname === "/settings"}
-        />
-        <button className="p-3 text-gray-500 hover:text-rose-500 hover:bg-rose-500/10 rounded-xl transition-all">
-          <Logout />
+      {/* Logout - Pinned to bottom */}
+      <div className="mt-auto pt-6 border-t border-zinc-800/50 w-full flex justify-center">
+        <button className="group relative p-2 text-zinc-500 hover:text-rose-400 transition-colors">
+          <Logout className="!text-[20px]" />
+          <Tooltip label="Logout" />
         </button>
       </div>
     </aside>
   );
 };
 
-// Refined NavItem
+// Standard Nav Link
 const NavItem = ({ path, icon: Icon, label, isActive }) => (
   <Link to={path} className="relative group flex items-center justify-center">
     <div
-      className={`p-3 rounded-xl transition-all duration-300 ${
+      className={`p-2 rounded-lg transition-all duration-200 ${
         isActive
-          ? "bg-blue-600 text-white shadow-lg shadow-blue-600/40"
-          : "text-gray-500 hover:bg-white/5 hover:text-gray-200"
+          ? "bg-zinc-800 text-white"
+          : "text-zinc-500 hover:text-zinc-200"
       }`}
     >
-      <Icon />
+      <Icon className="!text-[20px]" />
     </div>
-    <span className="absolute left-16 px-3 py-1.5 bg-gray-900 border border-gray-800 text-white text-xs rounded-md opacity-0 group-hover:opacity-100 translate-x-2 group-hover:translate-x-0 transition-all pointer-events-none whitespace-nowrap z-[110]">
-      {label}
-    </span>
+    <Tooltip label={label} />
   </Link>
 );
 
-// Fixed QuickAction Component
-const QuickAction = () => {
+// Integrated Action Item (Dropdown)
+const ActionItem = ({ icon: Icon, label, header, items }) => {
   const [isOpen, setIsOpen] = useState(false);
-  const menuRef = useRef(null);
+  const containerRef = useRef(null);
 
-  // Close menu if clicking outside
   useEffect(() => {
-    const handleClickOutside = (e) => {
-      if (menuRef.current && !menuRef.current.contains(e.target))
+    const clickOut = (e) => {
+      if (containerRef.current && !containerRef.current.contains(e.target))
         setIsOpen(false);
     };
-    document.addEventListener("mousedown", handleClickOutside);
-    return () => document.removeEventListener("mousedown", handleClickOutside);
+    document.addEventListener("mousedown", clickOut);
+    return () => document.removeEventListener("mousedown", clickOut);
   }, []);
 
-  const links = [
-    {
-      label: "Add Member",
-      path: "/add-member",
-      icon: <People fontSize="small" />,
-    },
-    {
-      label: "Add Coach",
-      path: "/add-coach",
-      icon: <Sports fontSize="small" />,
-    },
-    {
-      label: "New Schedule",
-      path: "/add-schedule",
-      icon: <EventNote fontSize="small" />,
-    },
-  ];
-
   return (
-    <div className="relative" ref={menuRef}>
+    <div className="relative flex justify-center group" ref={containerRef}>
       <button
         onClick={() => setIsOpen(!isOpen)}
-        className={`p-3 rounded-xl transition-all ${isOpen ? "bg-emerald-500 text-white" : "bg-white/5 text-emerald-500 border border-emerald-500/20 hover:bg-emerald-500/10"}`}
+        className={`p-2 rounded-lg transition-all duration-200 ${
+          isOpen
+            ? "bg-zinc-800 text-blue-400"
+            : "text-zinc-500 hover:text-zinc-200"
+        }`}
       >
-        <AddBox />
+        <Icon className="!text-[20px]" />
       </button>
 
+      {!isOpen && <Tooltip label={label} />}
+
       {isOpen && (
-        <div className="absolute left-full top-0 ml-4 w-52 bg-[#111113] border border-white/10 rounded-xl shadow-2xl overflow-hidden py-2 animate-in fade-in slide-in-from-left-2 duration-200">
-          <div className="px-4 py-2 mb-1">
-            <p className="text-[10px] font-bold text-gray-500 uppercase tracking-tighter">
-              Quick Create
+        <div className="absolute left-full top-0 ml-3 w-44 bg-[#0c0c0e] border border-zinc-800 rounded-lg shadow-2xl py-1.5 animate-in fade-in slide-in-from-left-1 duration-150 z-[120]">
+          <div className="px-3 py-1.5 mb-1 border-b border-zinc-800/50">
+            <p className="text-[10px] font-bold text-zinc-600 uppercase tracking-widest">
+              {header}
             </p>
           </div>
-          {links.map((link) => (
+          {items.map((item) => (
             <Link
-              key={link.path}
-              to={link.path}
-              onClick={() => setIsOpen(false)} // Close menu on click
-              className="flex items-center gap-3 px-4 py-3 text-sm text-gray-300 hover:bg-blue-600 hover:text-white transition-colors"
+              key={item.path}
+              to={item.path}
+              onClick={() => setIsOpen(false)}
+              className="flex items-center gap-2.5 px-3 py-2 text-[12px] text-zinc-400 hover:bg-zinc-800 hover:text-white transition-colors"
             >
-              <span className="opacity-70">{link.icon}</span>
-              {link.label}
+              <span className="text-zinc-500">{item.icon}</span>
+              {item.label}
             </Link>
           ))}
         </div>
@@ -155,5 +169,11 @@ const QuickAction = () => {
     </div>
   );
 };
+
+const Tooltip = ({ label }) => (
+  <span className="absolute left-12 px-2 py-1 bg-zinc-900 border border-zinc-800 text-zinc-200 text-[11px] font-medium rounded opacity-0 group-hover:opacity-100 translate-x-1 group-hover:translate-x-0 transition-all pointer-events-none whitespace-nowrap z-[110]">
+    {label}
+  </span>
+);
 
 export default Sidebar;

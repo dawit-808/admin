@@ -9,7 +9,7 @@ export const AuthProvider = ({ children }) => {
   const [loading, setLoading] = useState(true);
   const [authReady, setAuthReady] = useState(false);
 
-  // 🔥 Refresh user on app load
+  // Refresh user on app load
   useEffect(() => {
     const refresh = async () => {
       try {

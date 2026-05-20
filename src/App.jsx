@@ -3,16 +3,20 @@ import {
   Routes,
   Route,
   Navigate,
+  Outlet,
 } from "react-router-dom";
-
 import { useContext } from "react";
 import { AuthContext } from "./context/AuthContext";
 
+// Components
+import RoleRoute from "./components/RoleRoute";
+import AuthLoader from "./components/AuthLoader";
+
+// Pages
 import Dashboard from "./pages/Dashboard";
 import AddMember from "./pages/AddMember";
 import AddCoach from "./pages/AddCoach";
 import Auth from "./pages/Auth";
-import RoleRoute from "./components/RoleRoute";
 import Statistics from "./pages/Statistics";
 import Coaches from "./pages/Coaches";
 import CoachProfile from "./pages/CoachProfile";
@@ -20,67 +24,28 @@ import CoachProfile from "./pages/CoachProfile";
 function AppRoutes() {
   const { loading, authReady } = useContext(AuthContext);
 
-  // 🔥 BLOCK APP UNTIL AUTH IS READY
-  if (loading || !authReady) {
-    return (
-      <div className="min-h-screen flex items-center justify-center bg-[#030712] text-white">
-        Loading app...
-      </div>
-    );
-  }
+  if (loading || !authReady) return <AuthLoader />;
 
   return (
     <Routes>
-      {/* Public */}
+      {/* Public Routes */}
       <Route path="/login" element={<Auth />} />
 
-      {/* Protected */}
-      <Route
-        path="/"
-        element={
-          <RoleRoute allowedRoles={["admin"]}>
-            <Dashboard />
-          </RoleRoute>
-        }
-      />
+      {/* Admin Restricted Workspace */}
+      <Route element={<RoleRoute allowedRoles={["admin"]} />}>
+        {/* All routes inside this block inherit the admin requirement */}
+        <Route path="/" element={<Dashboard />} />
+        <Route path="/add-member" element={<AddMember />} />
+        <Route path="/add-coach" element={<AddCoach />} />
+        <Route path="/statistics" element={<Statistics />} />
+        <Route path="/coaches" element={<Coaches />} />
+      </Route>
 
-      <Route
-        path="/add-member"
-        element={
-          <RoleRoute allowedRoles={["admin"]}>
-            <AddMember />
-          </RoleRoute>
-        }
-      />
-
-      <Route
-        path="/add-coach"
-        element={
-          <RoleRoute allowedRoles={["admin"]}>
-            <AddCoach />
-          </RoleRoute>
-        }
-      />
-
-      <Route
-        path="/statistics"
-        element={
-          <RoleRoute allowedRoles={["admin"]}>
-            <Statistics />
-          </RoleRoute>
-        }
-      />
-
-      <Route
-        path="/coaches"
-        element={
-          <RoleRoute allowedRoles={["admin"]}>
-            <Coaches />
-          </RoleRoute>
-        }
-      />
-
+      {/* Hybrid/Shared Routes */}
       <Route path="/coaches/:id" element={<CoachProfile />} />
+
+      {/* Catch-all: Redirect unknown to Dashboard */}
+      <Route path="*" element={<Navigate to="/" replace />} />
     </Routes>
   );
 }
