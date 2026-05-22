@@ -3,6 +3,7 @@ import api from "../api/api";
 import Sidebar from "../components/Sidebar";
 import { AuthContext } from "../context/AuthContext";
 import ThemeToggle from "../components/ThemeToggle";
+import AuthLoader from "../components/AuthLoader";
 
 // MUI Icons
 import GroupIcon from "@mui/icons-material/Group";
@@ -47,6 +48,8 @@ function Statistics() {
 
   const paymentRate = getPercent(stats.paid);
 
+  if (loading) return <AuthLoader />;
+
   return (
     <div className="min-h-screen bg-zinc-50 dark:bg-[#030303] text-zinc-600 dark:text-zinc-400 font-sans antialiased transition-colors duration-500">
       <Sidebar />
@@ -58,9 +61,6 @@ function Statistics() {
           <h1 className="text-3xl font-semibold tracking-tight text-zinc-900 dark:text-white">
             Dashboard Analytics
           </h1>
-          <p className="text-sm text-zinc-500">
-            Performance breakdown and member demographics
-          </p>
         </header>
 
         {/* SUMMARY CARDS WITH PERCENTAGES */}

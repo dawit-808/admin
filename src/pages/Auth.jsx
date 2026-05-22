@@ -43,7 +43,7 @@ function Auth() {
         <form onSubmit={handleLogin} className="space-y-4">
           <div className="space-y-1.5">
             <label className="text-[12px] font-medium text-zinc-500 ml-1 uppercase tracking-wider">
-              Identifier
+              ID
             </label>
             <input
               type="text"
@@ -61,7 +61,7 @@ function Auth() {
               </label>
               <button
                 type="button"
-                className="text-[11px] text-zinc-600 hover:text-zinc-300 transition-colors"
+                className="text-[11px] text-zinc-600 hover:text-zinc-300 transition-colors cursor-pointer"
               >
                 Forgot?
               </button>
@@ -78,7 +78,7 @@ function Auth() {
           <button
             type="submit"
             disabled={loading}
-            className="group relative w-full h-11 mt-4 bg-zinc-100 text-zinc-950 rounded-lg font-semibold text-sm hover:bg-white active:scale-[0.98] transition-all disabled:opacity-50 disabled:active:scale-100 flex items-center justify-center gap-2"
+            className="group relative w-full h-11 mt-4 bg-zinc-100 text-zinc-950 rounded-lg font-semibold text-sm hover:bg-white active:scale-[0.98] transition-all disabled:opacity-50 disabled:active:scale-100 flex items-center justify-center gap-2 cursor-pointer"
           >
             {loading ? (
               <div className="h-4 w-4 border-2 border-zinc-950/20 border-t-zinc-950 rounded-full animate-spin" />

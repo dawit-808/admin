@@ -1,20 +1,20 @@
-import { useEffect, useState, useContext } from "react";
+import { useEffect, useState } from "react";
 import api from "../api/api";
 import MembersTable from "../components/MembersTable";
 import Sidebar from "../components/Sidebar";
 import ThemeToggle from "../components/ThemeToggle";
-import { AuthContext } from "../context/AuthContext";
+import AddMembers from "../components/Addmembers/AddMembers";
 
 // Icons
 import GroupIcon from "@mui/icons-material/Group";
 import PaymentsIcon from "@mui/icons-material/Payments";
 import RadarIcon from "@mui/icons-material/Radar";
+import AddIcon from "@mui/icons-material/Add";
 
-function Dashboard() {
-  const { accessToken } = useContext(AuthContext);
-
+function Members() {
   const [members, setMembers] = useState([]);
   const [loading, setLoading] = useState(true);
+  const [isModalOpen, setIsModalOpen] = useState(false);
 
   const [page, setPage] = useState(1);
   const [totalPages, setTotalPages] = useState(1);
@@ -25,9 +25,7 @@ function Dashboard() {
 
   const limit = 15;
 
-  const [stats, setStats] = useState({ totalMembers: 0, paid: 0 });
-
-  //  Fetch Members
+  // Fetch Members
   const fetchMembers = async (pageNumber, query) => {
     try {
       setLoading(true);
@@ -47,20 +45,7 @@ function Dashboard() {
     }
   };
 
-  //  Fetch Stats (ONLY ONCE)
-  const fetchStats = async () => {
-    try {
-      const res = await api.get("/stats");
-      setStats({
-        totalMembers: res.data.totalMembers,
-        paid: res.data.paid,
-      });
-    } catch (err) {
-      console.error("Failed to fetch stats:", err);
-    }
-  };
-
-  //  Debounced Search
+  // Debounced Search
   useEffect(() => {
     const delay = setTimeout(() => {
       setPage(1);
@@ -70,15 +55,10 @@ function Dashboard() {
     return () => clearTimeout(delay);
   }, [searchTerm]);
 
-  //  Fetch Members when page OR search changes
+  // Fetch Members when page OR search changes
   useEffect(() => {
     fetchMembers(page, activeSearch);
   }, [page, activeSearch]);
-
-  //  Fetch stats once
-  useEffect(() => {
-    fetchStats();
-  }, []);
 
   return (
     <div className="min-h-screen bg-zinc-50 dark:bg-[#030303] text-zinc-600 dark:text-zinc-400 font-sans antialiased transition-colors duration-500">
@@ -87,41 +67,21 @@ function Dashboard() {
 
       <main className="ml-20 min-h-screen">
         <div className="max-w-[1400px] mx-auto px-8 py-12 space-y-12">
-          <header className="space-y-1">
-            <h1 className="text-2xl font-semibold text-white uppercase">
-              Overview
+          {/* Flexbox header keeps title and button aligned beautifully */}
+          <header className="flex justify-between items-center border-b border-zinc-100 dark:border-zinc-900 pb-4">
+            <h1 className="text-2xl font-semibold text-zinc-900 dark:text-white">
+              Members Management
             </h1>
-            <p className="text-xs text-zinc-500 font-medium">
-              Manage your gym ecosystem
-            </p>
+
+            <button
+              onClick={() => setIsModalOpen(true)}
+              className="flex items-center gap-2 bg-zinc-900 hover:bg-zinc-800 dark:bg-white dark:hover:bg-zinc-200 text-white dark:text-black px-4 py-2 text-sm font-medium transition-colors duration-200 shadow-sm"
+            >
+              <AddIcon fontSize="small" /> Register Member
+            </button>
           </header>
 
-          {/* STATS */}
-          <div className="grid grid-cols-1 md:grid-cols-3 gap-px bg-zinc-200 dark:bg-white/[0.05] border rounded-2xl overflow-hidden shadow-sm">
-            <StatCard
-              title="Total Members"
-              value={stats.totalMembers}
-              icon={<GroupIcon sx={{ fontSize: 20 }} />}
-              subtext="Total registered"
-            />
-
-            <StatCard
-              title="Monthly Revenue"
-              value="$14,200"
-              icon={<PaymentsIcon sx={{ fontSize: 20 }} />}
-              subtext="Current collection"
-            />
-
-            <StatCard
-              title="Active Now"
-              value={stats.paid}
-              icon={<RadarIcon sx={{ fontSize: 20 }} />}
-              subtext="Checked in"
-              isLive
-            />
-          </div>
-
-          {/* TABLE */}
+          {/* TABLE SECTION */}
           <section className="pt-4">
             <MembersTable
               members={members}
@@ -136,6 +96,13 @@ function Dashboard() {
           </section>
         </div>
       </main>
+
+      {/* MODAL MOUNTED AT ROOT ENTRY LEVEL */}
+      <AddMembers
+        isOpen={isModalOpen}
+        onClose={() => setIsModalOpen(false)}
+        onSuccess={() => fetchMembers(page, activeSearch)}
+      />
     </div>
   );
 }
@@ -166,4 +133,4 @@ function StatCard({ title, value, icon, subtext, isLive }) {
   );
 }
 
-export default Dashboard;
+export default Members;

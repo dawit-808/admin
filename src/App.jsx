@@ -13,9 +13,7 @@ import RoleRoute from "./components/RoleRoute";
 import AuthLoader from "./components/AuthLoader";
 
 // Pages
-import Dashboard from "./pages/Dashboard";
-import AddMember from "./pages/AddMember";
-import AddCoach from "./pages/AddCoach";
+import Members from "./pages/Members";
 import Auth from "./pages/Auth";
 import Statistics from "./pages/Statistics";
 import Coaches from "./pages/Coaches";
@@ -34,10 +32,8 @@ function AppRoutes() {
       {/* Admin Restricted Workspace */}
       <Route element={<RoleRoute allowedRoles={["admin"]} />}>
         {/* All routes inside this block inherit the admin requirement */}
-        <Route path="/" element={<Dashboard />} />
-        <Route path="/add-member" element={<AddMember />} />
-        <Route path="/add-coach" element={<AddCoach />} />
-        <Route path="/statistics" element={<Statistics />} />
+        <Route path="/" element={<Statistics />} />
+        <Route path="/members" element={<Members />} />
         <Route path="/coaches" element={<Coaches />} />
       </Route>
 

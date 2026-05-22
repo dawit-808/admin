@@ -27,21 +27,20 @@ const Sidebar = () => {
       {/* Main Nav Stack - All items share equal vertical spacing */}
       <div className="flex flex-col gap-4 items-center w-full">
         <NavItem
-          path="/"
-          icon={SpaceDashboard}
-          label="Dashboard"
-          isActive={location.pathname === "/"}
-        />
-        <NavItem
           path="/statistics"
           icon={BarChart}
           label="Stats"
           isActive={location.pathname === "/statistics"}
         />
-
+        <NavItem
+          path="/members"
+          icon={People}
+          label="Members"
+          isActive={location.pathname === "/members"}
+        />
         <NavItem
           path="/coaches"
-          icon={People}
+          icon={HowToReg}
           label="Staff"
           isActive={location.pathname === "/coaches"}
         />
@@ -50,25 +49,6 @@ const Sidebar = () => {
           icon={EventNote}
           label="Schedule"
           isActive={location.pathname === "/schedules"}
-        />
-
-        {/* Action Items - Integrated into the same flow */}
-        <ActionItem
-          icon={HowToReg}
-          label="Register"
-          header="Registration"
-          items={[
-            {
-              label: "New Member",
-              path: "/register/member",
-              icon: <PersonAdd className="!text-[16px]" />,
-            },
-            {
-              label: "New Coach",
-              path: "/register/coach",
-              icon: <Sports className="!text-[16px]" />,
-            },
-          ]}
         />
 
         <ActionItem
