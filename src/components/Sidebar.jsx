@@ -1,5 +1,6 @@
-import React, { useState, useRef, useEffect } from "react";
-import { Link, useLocation } from "react-router-dom";
+import React, { useState, useRef, useEffect, useContext } from "react";
+import { Link, useLocation, useNavigate } from "react-router-dom";
+import { AuthContext } from "../context/AuthContext";
 import {
   SpaceDashboard,
   People,
@@ -14,6 +15,18 @@ import {
 
 const Sidebar = () => {
   const location = useLocation();
+  const navigate = useNavigate();
+  const { logout } = useContext(AuthContext);
+
+  const handleLogout = async () => {
+    try {
+      await logout();
+
+      navigate("/login");
+    } catch (err) {
+      console.error(err);
+    }
+  };
 
   return (
     <aside className="fixed left-0 top-0 h-screen w-16 flex flex-col items-center py-6 bg-[#09090b] border-r border-zinc-800/50 z-[100]">
@@ -72,7 +85,10 @@ const Sidebar = () => {
 
       {/* Logout - Pinned to bottom */}
       <div className="mt-auto pt-6 border-t border-zinc-800/50 w-full flex justify-center">
-        <button className="group relative p-2 text-zinc-500 hover:text-rose-400 transition-colors">
+        <button
+          onClick={handleLogout}
+          className="group relative p-2 text-zinc-500 hover:text-rose-400 transition-colors cursor-pointer"
+        >
           <Logout className="!text-[20px]" />
           <Tooltip label="Logout" />
         </button>

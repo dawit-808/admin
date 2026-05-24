@@ -44,7 +44,7 @@ export const AuthProvider = ({ children }) => {
     } finally {
       setAccessToken(null);
       setRole(null);
-      setAuthReady(false);
+      setAuthReady(true);
     }
   };
 

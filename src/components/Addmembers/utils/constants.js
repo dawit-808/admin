@@ -25,9 +25,17 @@ export const INITIAL_FORM_DATA = {
 };
 
 export const STEPS = [
-  { id: 1, label: "Identity Core",        header: "Profile Attributes & Security" },
-  { id: 2, label: "Health & Emergency",   header: "Health Parameters & Emergency Contact" },
-  { id: 3, label: "System Deployments",   header: "Schedules, Workouts & Assignments" },
+  { id: 1, label: "Identity Core", header: "Profile Attributes & Security" },
+  {
+    id: 2,
+    label: "Health & Emergency",
+    header: "Health Parameters & Emergency Contact",
+  },
+  {
+    id: 3,
+    label: "System Deployments",
+    header: "Schedules, Workouts & Assignments",
+  },
 ];
 
 export const CLOUDINARY_URL =
