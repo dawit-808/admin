@@ -1,5 +1,6 @@
 import { useState } from "react";
 import CloseIcon from "@mui/icons-material/Close";
+import { Loader2 } from "lucide-react";
 import api from "../../api/api";
 
 import { STEPS } from "./utils/constants";
@@ -12,8 +13,6 @@ import { StepIdentity } from "./steps/StepIdentity";
 import { StepHealthEmergency } from "./steps/StepHealthEmergency";
 import { StepDeployments } from "./steps/StepDeployments";
 
-// ---------------------------------------------------------------------------
-
 function AddMembers({ isOpen, onClose, onSuccess }) {
   const [activeStep, setActiveStep] = useState(1);
   const [isSubmitting, setIsSubmitting] = useState(false);
@@ -25,8 +24,12 @@ function AddMembers({ isOpen, onClose, onSuccess }) {
 
   if (!isOpen) return null;
 
-  // Step 1 requires name + birth date before advancing
-  const canAdvanceStep1 = formData.member.name && formData.member.b_date;
+  // Validation Logic
+  const canAdvance = {
+    1: formData.member.name && formData.member.b_date,
+    2: true, // Add validation for health if needed
+    3: true,
+  };
 
   const handleSubmit = async () => {
     setIsSubmitting(true);
@@ -51,7 +54,6 @@ function AddMembers({ isOpen, onClose, onSuccess }) {
       onClose();
     } catch (err) {
       console.error("Registration failed:", err);
-      alert("Registration failed. Please try again.");
     } finally {
       setIsSubmitting(false);
     }
@@ -60,98 +62,99 @@ function AddMembers({ isOpen, onClose, onSuccess }) {
   const stepLabel = STEPS.find((s) => s.id === activeStep)?.header ?? "";
 
   return (
-    <div className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-black/60 backdrop-blur-md">
-      <div className="w-full max-w-4xl bg-white dark:bg-[#09090b] border border-zinc-200 dark:border-zinc-800 shadow-2xl flex flex-col md:flex-row min(680px, 90vh) overflow-hidden">
-        {/* ── Left: Step sidebar ── */}
-        <aside className="w-full md:w-60 bg-zinc-50 dark:bg-[#030303] border-b md:border-b-0 md:border-r border-zinc-200 dark:border-zinc-800 p-6 flex flex-col justify-between">
-          <div className="space-y-6">
-            <div>
-              <h2 className="text-base font-bold text-zinc-900 dark:text-white mt-0.5">
-                New Member
-              </h2>
-            </div>
-            <nav className="space-y-4">
-              {STEPS.map((step) => (
-                <StepIndicator
-                  key={step.id}
-                  num={step.id}
-                  label={step.label}
-                  active={activeStep === step.id}
-                  done={activeStep > step.id}
-                  onClick={() => setActiveStep(step.id)}
-                />
-              ))}
-            </nav>
+    <div className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-zinc-950/40 backdrop-blur-sm animate-in fade-in duration-300">
+      <div className="w-full max-w-5xl bg-white dark:bg-[#09090b] border border-zinc-200 dark:border-zinc-800 shadow-2xl flex flex-col md:flex-row h-[min(720px,90vh)] overflow-hidden rounded-2xl">
+        {/* ── Left: Pro Sidebar ── */}
+        <aside className="w-full md:w-64 bg-zinc-50/50 dark:bg-zinc-900/20 border-b md:border-b-0 md:border-r border-zinc-200 dark:border-zinc-800 p-8 flex flex-col">
+          <div className="mb-8">
+            <h2 className="text-lg font-semibold text-zinc-900 dark:text-white tracking-tight">
+              New Member
+            </h2>
+            <p className="text-xs text-zinc-500 mt-1">
+              Complete the onboarding flow.
+            </p>
           </div>
-          <p className="hidden md:block text-[10px] text-zinc-400 leading-relaxed">
-            All nodes register on final dataset commit.
-          </p>
+
+          <nav className="space-y-1">
+            {STEPS.map((step) => (
+              <StepIndicator
+                key={step.id}
+                num={step.id}
+                label={step.label}
+                active={activeStep === step.id}
+                done={activeStep > step.id}
+                onClick={() => activeStep > step.id && setActiveStep(step.id)} // Allow jumping back to completed steps
+              />
+            ))}
+          </nav>
         </aside>
 
         {/* ── Right: Form content ── */}
-        <div className="flex-1 flex flex-col min-h-0">
+        <div className="flex-1 flex flex-col min-h-0 relative">
           {/* Header */}
-          <header className="px-6 py-4 border-b border-zinc-100 dark:border-zinc-800 flex items-center justify-between shrink-0">
-            <p className="text-xs font-semibold text-zinc-700 dark:text-zinc-200">
+          <header className="px-8 py-5 border-b border-zinc-100 dark:border-zinc-800 flex items-center justify-between shrink-0 bg-white/80 dark:bg-[#09090b]/80 backdrop-blur-md sticky top-0 z-10">
+            <p className="text-sm font-medium text-zinc-800 dark:text-zinc-200">
               {stepLabel}
             </p>
             <button
               type="button"
               onClick={onClose}
-              className="p-1 text-zinc-400 hover:text-zinc-700 dark:hover:text-white transition-colors"
+              className="p-1.5 rounded-full text-zinc-400 hover:bg-zinc-100 dark:hover:bg-zinc-800 transition-all"
             >
-              <CloseIcon fontSize="small" />
+              <CloseIcon sx={{ fontSize: 18 }} />
             </button>
           </header>
 
           {/* Scrollable step content */}
-          <main className="flex-1 overflow-y-auto px-6 py-5">
-            {activeStep === 1 && (
-              <StepIdentity
-                formData={formData}
-                setSection={setSection}
-                setField={setField}
-                addresses={deps.addresses}
-                imageUpload={imgUpload}
-              />
-            )}
-            {activeStep === 2 && (
-              <StepHealthEmergency
-                formData={formData}
-                setSection={setSection}
-              />
-            )}
-            {activeStep === 3 && (
-              <StepDeployments
-                formData={formData}
-                toggleArrayItem={toggleArrayItem}
-                schedules={deps.schedules}
-                trainingTypes={deps.trainingTypes}
-                coaches={deps.coaches}
-                uploadProgress={imgUpload.progress}
-              />
-            )}
+          <main className="flex-1 overflow-y-auto px-8 py-6">
+            <div className="max-w-2xl mx-auto animate-in slide-in-from-bottom-2 duration-500">
+              {activeStep === 1 && (
+                <StepIdentity
+                  formData={formData}
+                  setSection={setSection}
+                  setField={setField}
+                  addresses={deps.addresses}
+                  imageUpload={imgUpload}
+                />
+              )}
+              {activeStep === 2 && (
+                <StepHealthEmergency
+                  formData={formData}
+                  setSection={setSection}
+                />
+              )}
+              {activeStep === 3 && (
+                <StepDeployments
+                  formData={formData}
+                  toggleArrayItem={toggleArrayItem}
+                  schedules={deps.schedules}
+                  trainingTypes={deps.trainingTypes}
+                  coaches={deps.coaches}
+                  uploadProgress={imgUpload.progress}
+                />
+              )}
+            </div>
           </main>
 
           {/* Footer nav */}
-          <footer className="px-5 py-3.5 border-t border-zinc-100 dark:border-zinc-800 bg-zinc-50/50 dark:bg-[#030303]/10 flex items-center justify-between shrink-0">
+          <footer className="px-8 py-4 border-t border-zinc-100 dark:border-zinc-800 bg-white dark:bg-[#09090b] flex items-center justify-between shrink-0">
             <div>
               {activeStep > 1 && (
                 <button
                   type="button"
                   onClick={() => setActiveStep((p) => p - 1)}
-                  className="px-4 py-2 text-xs font-medium border border-zinc-200 dark:border-zinc-700 text-zinc-600 dark:text-zinc-300 hover:bg-zinc-100 dark:hover:bg-zinc-900 transition-colors"
+                  className="px-5 py-2 text-xs font-medium border border-zinc-200 dark:border-zinc-700 text-zinc-600 dark:text-zinc-300 hover:bg-zinc-100 dark:hover:bg-zinc-800 rounded-full transition-all active:scale-95 cursor-pointer"
                 >
                   Back
                 </button>
               )}
             </div>
 
-            <div className="flex items-center gap-2">
+            <div className="flex items-center gap-3">
               <button
                 type="button"
                 onClick={onClose}
-                className="px-4 py-2 text-xs font-medium text-zinc-400 hover:text-zinc-700 dark:hover:text-zinc-200 transition-colors cursor-pointer"
+                className="px-4 py-2 text-xs font-medium text-zinc-400 hover:text-zinc-800 dark:hover:text-zinc-200 transition-colors cursor-pointer"
               >
                 Cancel
               </button>
@@ -159,9 +162,9 @@ function AddMembers({ isOpen, onClose, onSuccess }) {
               {activeStep < 3 ? (
                 <button
                   type="button"
-                  disabled={activeStep === 1 && !canAdvanceStep1}
+                  disabled={!canAdvance[activeStep]}
                   onClick={() => setActiveStep((p) => p + 1)}
-                  className="px-5 py-2 text-xs font-medium bg-zinc-900 hover:bg-zinc-700 dark:bg-white dark:hover:bg-zinc-200 text-white dark:text-black disabled:opacity-40 transition-colors cursor-pointer"
+                  className="px-8 py-2.5 text-xs font-medium bg-zinc-900 hover:bg-zinc-800 dark:bg-white dark:hover:bg-zinc-100 text-white dark:text-black rounded-full disabled:opacity-40 transition-all active:scale-95 cursor-pointer shadow-md"
                 >
                   Continue
                 </button>
@@ -170,9 +173,10 @@ function AddMembers({ isOpen, onClose, onSuccess }) {
                   type="button"
                   onClick={handleSubmit}
                   disabled={isSubmitting}
-                  className="px-5 py-2 text-xs font-medium bg-zinc-900 hover:bg-zinc-700 dark:bg-white dark:hover:bg-zinc-200 text-white dark:text-black disabled:opacity-50 transition-colors"
+                  className="px-8 py-2.5 text-xs font-medium bg-zinc-900 hover:bg-zinc-800 dark:bg-white dark:hover:bg-zinc-100 text-white dark:text-black rounded-full disabled:opacity-50 transition-all active:scale-95 cursor-pointer shadow-md flex items-center gap-2"
                 >
-                  {isSubmitting ? "Saving…" : "Register Member"}
+                  {isSubmitting && <Loader2 className="w-3 h-3 animate-spin" />}
+                  {isSubmitting ? "Processing..." : "Register Member"}
                 </button>
               )}
             </div>

@@ -53,7 +53,7 @@ export function StepIdentity({
           label="Phone"
           value={member.phone}
           onChange={(v) => setSection("member", "phone", v)}
-          placeholder="+251 9xx xxx xxxx"
+          placeholder="09xxxxxxxx"
         />
       </div>
 
