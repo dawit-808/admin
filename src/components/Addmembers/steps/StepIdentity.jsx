@@ -13,7 +13,7 @@ export function StepIdentity({
     <div className="space-y-5">
       <div>
         <label className="block text-[10px] uppercase tracking-widest font-semibold text-zinc-400 mb-2">
-          Member Avatar
+          Member Profile
         </label>
         <UploadZone
           preview={imageUpload.preview}

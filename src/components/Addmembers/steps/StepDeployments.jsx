@@ -12,7 +12,7 @@ export function StepDeployments({
     <div className="space-y-5">
       <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
         <div className="space-y-2">
-          <SectionHeading>Schedule Slots</SectionHeading>
+          <SectionHeading>Schedules</SectionHeading>
           <CheckList
             items={schedules}
             selectedIds={formData.scheduleIds}

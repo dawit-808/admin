@@ -72,12 +72,12 @@ const Sidebar = () => {
             {
               label: "Add Member",
               path: "/add-member",
-              icon: <People className="!text-[16px]" />,
+              icon: <People className="!text-[16px] cursor-pointer" />,
             },
             {
               label: "Add Schedule",
               path: "/add-schedule",
-              icon: <EventNote className="!text-[16px]" />,
+              icon: <EventNote className="!text-[16px] cursor-pointer" />,
             },
           ]}
         />

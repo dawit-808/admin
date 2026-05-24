@@ -6,7 +6,7 @@ export function StepHealthEmergency({ formData, setSection }) {
   return (
     <div className="space-y-6">
       <div className="space-y-4">
-        <SectionHeading>Physiological Metrics</SectionHeading>
+        <SectionHeading>Physical Status</SectionHeading>
         <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
           <FormInput
             label="Height (cm)"

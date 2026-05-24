@@ -18,6 +18,7 @@ import Auth from "./pages/Auth";
 import Statistics from "./pages/Statistics";
 import Coaches from "./pages/Coaches";
 import CoachProfile from "./pages/CoachProfile";
+import AddMember from "./pages/AddMember";
 
 function AppRoutes() {
   const { loading, authReady } = useContext(AuthContext);
@@ -35,6 +36,7 @@ function AppRoutes() {
         <Route path="/" element={<Statistics />} />
         <Route path="/members" element={<Members />} />
         <Route path="/coaches" element={<Coaches />} />
+        <Route path="/add-member" element={<AddMember />} />
       </Route>
 
       {/* Hybrid/Shared Routes */}

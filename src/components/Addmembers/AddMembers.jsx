@@ -66,9 +66,6 @@ function AddMembers({ isOpen, onClose, onSuccess }) {
         <aside className="w-full md:w-60 bg-zinc-50 dark:bg-[#030303] border-b md:border-b-0 md:border-r border-zinc-200 dark:border-zinc-800 p-6 flex flex-col justify-between">
           <div className="space-y-6">
             <div>
-              <p className="text-[9px] tracking-widest uppercase text-zinc-400 font-bold">
-                Database Portal
-              </p>
               <h2 className="text-base font-bold text-zinc-900 dark:text-white mt-0.5">
                 New Member
               </h2>
@@ -154,7 +151,7 @@ function AddMembers({ isOpen, onClose, onSuccess }) {
               <button
                 type="button"
                 onClick={onClose}
-                className="px-4 py-2 text-xs font-medium text-zinc-400 hover:text-zinc-700 dark:hover:text-zinc-200 transition-colors"
+                className="px-4 py-2 text-xs font-medium text-zinc-400 hover:text-zinc-700 dark:hover:text-zinc-200 transition-colors cursor-pointer"
               >
                 Cancel
               </button>
@@ -164,7 +161,7 @@ function AddMembers({ isOpen, onClose, onSuccess }) {
                   type="button"
                   disabled={activeStep === 1 && !canAdvanceStep1}
                   onClick={() => setActiveStep((p) => p + 1)}
-                  className="px-5 py-2 text-xs font-medium bg-zinc-900 hover:bg-zinc-700 dark:bg-white dark:hover:bg-zinc-200 text-white dark:text-black disabled:opacity-40 transition-colors"
+                  className="px-5 py-2 text-xs font-medium bg-zinc-900 hover:bg-zinc-700 dark:bg-white dark:hover:bg-zinc-200 text-white dark:text-black disabled:opacity-40 transition-colors cursor-pointer"
                 >
                   Continue
                 </button>
