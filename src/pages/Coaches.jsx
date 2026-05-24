@@ -37,43 +37,49 @@ function Coaches() {
       <Sidebar />
       <ThemeToggle />
 
-      <main className="ml-20 px-6 md:px-12 py-10 max-w-7xl mx-auto space-y-10">
-        {/* HEADER */}
-        <header className="flex flex-col md:flex-row md:items-end justify-between gap-4">
-          <div className="space-y-1">
-            <h1 className="text-3xl font-semibold tracking-tight text-zinc-900 dark:text-white">
+      <main className="ml-20 px-6 md:px-12 py-10 max-w-7xl mx-auto space-y-8 animate-in fade-in duration-300">
+        {/* ── HEADER ── */}
+        <header className="flex flex-col sm:flex-row sm:items-center justify-between gap-4 pb-4 border-b border-zinc-200/60 dark:border-zinc-800/60">
+          <div className="space-y-0.5">
+            <h1 className="text-2xl font-semibold tracking-tight text-zinc-900 dark:text-white">
               Coaches Team
             </h1>
-            <p className="text-sm text-zinc-500">
+            <p className="text-xs text-zinc-400">
               Manage directory and contact information for all staff members.
             </p>
           </div>
-          <div className="text-xs font-bold text-indigo-600 dark:text-indigo-400 bg-indigo-50 dark:bg-indigo-500/10 px-4 py-2 rounded-full border border-indigo-100 dark:border-indigo-500/20 w-fit">
-            Total Staff: {coaches.length}
+          <div className="text-[11px] font-mono font-bold text-zinc-700 dark:text-zinc-300 bg-white dark:bg-zinc-900 px-4 py-1.5 rounded-full border border-zinc-200 dark:border-zinc-800 shadow-sm w-fit">
+            STAFF_COUNT // {coaches.length.toString().padStart(2, "0")}
           </div>
         </header>
 
-        {/* CONTENT */}
+        {/* ── CONTENT CONTAINER ── */}
         {loading ? (
-          <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
+          /* Multi-card Skeleton Grid Layout */
+          <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
             {[1, 2, 3].map((n) => (
               <div
                 key={n}
-                className="h-80 bg-white dark:bg-zinc-900/40 animate-pulse rounded-2xl border border-zinc-200 dark:border-white/[0.05]"
+                className="h-[340px] bg-white dark:bg-zinc-900/20 animate-pulse rounded-2xl border border-zinc-200/60 dark:border-zinc-800/60"
               />
             ))}
           </div>
         ) : coaches.length === 0 ? (
-          <div className="flex flex-col items-center justify-center py-20 border-2 border-dashed border-zinc-200 dark:border-zinc-800 rounded-3xl bg-white/50 dark:bg-transparent">
-            <PersonIcon
-              className="text-zinc-300 dark:text-zinc-700 mb-2"
-              sx={{ fontSize: 48 }}
-            />
-            <p className="text-zinc-500 text-sm font-medium">
-              No coaches found in the registry
+          /* Empty fallback element layout */
+          <div className="flex flex-col items-center justify-center py-24 border border-dashed border-zinc-200 dark:border-zinc-800 rounded-2xl bg-white/40 dark:bg-transparent max-w-md mx-auto mt-12 text-center px-6">
+            <div className="w-12 h-12 rounded-full bg-zinc-100 dark:bg-zinc-900 flex items-center justify-center text-zinc-400 dark:text-zinc-600 mb-4">
+              <PersonIcon sx={{ fontSize: 22 }} />
+            </div>
+            <p className="text-zinc-800 dark:text-zinc-200 text-sm font-medium">
+              No coaches found
+            </p>
+            <p className="text-xs text-zinc-400 mt-1">
+              There are currently no staff records registered in the core
+              database directory.
             </p>
           </div>
         ) : (
+          /* Main Card Grid Display */
           <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
             {coaches.map((coach) => (
               <CoachCard key={coach.id} coach={coach} />
@@ -85,7 +91,7 @@ function Coaches() {
   );
 }
 
-/* ---------- Coach Card Component ---------- */
+/* ── COACH CARD COMPONENT ── */
 
 function CoachCard({ coach }) {
   const navigate = useNavigate();
@@ -95,78 +101,79 @@ function CoachCard({ coach }) {
     : null;
 
   return (
-    <div className="group relative bg-white dark:bg-zinc-900/40 border border-zinc-200 dark:border-white/[0.05] rounded-2xl overflow-hidden hover:bg-zinc-50 dark:hover:bg-zinc-900/60 transition-all duration-300 shadow-sm dark:shadow-none hover:shadow-md dark:hover:border-white/10">
-      {/* Top Decoration */}
-      <div className="absolute top-0 left-0 w-full h-1 bg-gradient-to-r from-transparent via-indigo-500/40 to-transparent opacity-0 group-hover:opacity-100 transition-opacity" />
-
-      {/* Card Header with Options */}
+    <div className="group relative bg-white dark:bg-[#09090b] border border-zinc-200 dark:border-zinc-800/80 rounded-2xl overflow-hidden hover:bg-zinc-50/30 dark:hover:bg-zinc-900/10 transition-all duration-300 shadow-sm hover:shadow-md">
+      {/* Context Menu Dropdown Anchor */}
       <div className="absolute top-4 right-4 z-10">
-        <button className="text-zinc-400 hover:text-zinc-900 dark:hover:text-white transition-colors">
-          <MoreVertIcon fontSize="small" />
+        <button className="p-1.5 rounded-full text-zinc-400 hover:text-zinc-900 dark:hover:text-zinc-100 hover:bg-zinc-100 dark:hover:bg-zinc-800/80 active:scale-95 transition-all cursor-pointer">
+          <MoreVertIcon sx={{ fontSize: 16 }} />
         </button>
       </div>
 
       <div className="p-6">
-        <div className="flex items-start gap-5">
-          {/* Avatar Area */}
+        <div className="flex items-center gap-4">
+          {/* Avatar Image Frame wrapper */}
           <div className="relative shrink-0">
-            <div className="w-20 h-20 rounded-2xl overflow-hidden border-2 border-zinc-100 dark:border-white/[0.05] bg-zinc-100 dark:bg-zinc-800 group-hover:border-indigo-500/30 transition-colors">
+            <div className="w-16 h-16 rounded-full overflow-hidden border border-zinc-200/60 dark:border-zinc-800 bg-zinc-50 dark:bg-zinc-900 flex items-center justify-center shadow-inner">
               {coach.url ? (
                 <img
                   src={coach.url}
                   alt={coach.name}
-                  className="w-full h-full object-cover group-hover:scale-110 transition-transform duration-500"
+                  className="w-full h-full object-cover group-hover:scale-105 transition-transform duration-500"
                 />
               ) : (
-                <div className="flex items-center justify-center h-full text-zinc-400 dark:text-zinc-600 bg-zinc-50 dark:bg-zinc-900">
-                  <PersonIcon sx={{ fontSize: 32 }} />
-                </div>
+                <span className="text-sm font-medium text-zinc-400 uppercase">
+                  {coach.name ? coach.name.charAt(0) : "?"}
+                </span>
               )}
             </div>
-            {/* Status Dot */}
-            <div className="absolute -bottom-1 -right-1 w-4 h-4 bg-emerald-500 border-2 border-white dark:border-[#030303] rounded-full shadow-sm" />
+            {/* System Status Node Indicator */}
+            <div className="absolute bottom-0 right-0 w-3.5 h-3.5 bg-emerald-500 border-2 border-white dark:border-[#09090b] rounded-full shadow-sm" />
           </div>
 
-          {/* Identity */}
-          <div className="space-y-1 pt-1">
-            <h2 className="text-zinc-900 dark:text-white font-bold text-lg leading-tight group-hover:text-indigo-600 dark:group-hover:text-indigo-400 transition-colors">
+          {/* Core Text Elements Block */}
+          <div className="space-y-0.5 min-w-0">
+            <h2 className="text-zinc-900 dark:text-zinc-100 font-semibold text-base leading-tight truncate pr-6">
               {coach.name}
             </h2>
-            <div className="flex items-center gap-2 text-[10px] font-bold text-zinc-400 dark:text-zinc-500 uppercase tracking-widest">
-              <span>{coach.gender}</span>
+            <div className="flex items-center gap-1.5 text-[10px] font-mono font-medium text-zinc-400 uppercase tracking-tight">
+              <span>{coach.gender || "Unspecified"}</span>
               {age && (
                 <>
-                  <span className="w-1 h-1 bg-zinc-300 dark:bg-zinc-700 rounded-full" />
-                  <span>{age} yrs</span>
+                  <span className="text-zinc-300 dark:text-zinc-700">•</span>
+                  <span>{age} YRS_OLD</span>
                 </>
               )}
             </div>
           </div>
         </div>
 
-        {/* Detailed Info Grid */}
-        <div className="mt-8 grid grid-cols-1 gap-2.5">
+        {/* Detailed Attribute Metric List rows */}
+        <div className="mt-6 space-y-1.5">
           <DetailRow
-            icon={<PhoneIcon sx={{ fontSize: 14 }} />}
+            icon={<PhoneIcon sx={{ fontSize: 13 }} />}
             label="Contact"
             value={coach.phone}
+            isMono
           />
           <DetailRow
-            icon={<BadgeIcon sx={{ fontSize: 14 }} />}
+            icon={<BadgeIcon sx={{ fontSize: 13 }} />}
             label="Registry ID"
             value={coach.ras_id}
+            isMono
           />
           <DetailRow
-            icon={<CakeIcon sx={{ fontSize: 14 }} />}
+            icon={<CakeIcon sx={{ fontSize: 13 }} />}
             label="Birth Date"
-            value={coach.b_date || "Not Provided"}
+            value={
+              coach.b_date ? new Date(coach.b_date).toLocaleDateString() : null
+            }
           />
         </div>
 
-        {/* Action Button */}
+        {/* Action Trigger Button Surface */}
         <button
           onClick={() => navigate(`/coaches/${coach.id}`)}
-          className="mt-6 w-full py-3 bg-zinc-50 dark:bg-white/[0.03] hover:bg-indigo-600 hover:text-white border border-zinc-200 dark:border-white/[0.05] rounded-xl text-xs font-bold text-zinc-600 dark:text-zinc-300 transition-all shadow-sm hover:shadow-indigo-500/20 active:scale-[0.98]"
+          className="mt-5 w-full py-2.5 bg-zinc-900 hover:bg-zinc-800 dark:bg-white dark:hover:bg-zinc-100 text-white dark:text-black rounded-full text-xs font-medium transition-all active:scale-95 shadow-sm cursor-pointer"
         >
           View Full Profile
         </button>
@@ -175,17 +182,21 @@ function CoachCard({ coach }) {
   );
 }
 
-function DetailRow({ icon, label, value }) {
+function DetailRow({ icon, label, value, isMono = false }) {
   return (
-    <div className="flex items-center justify-between p-3 rounded-xl bg-zinc-50/50 dark:bg-black/20 border border-zinc-100 dark:border-white/[0.02] transition-colors">
+    <div className="flex items-center justify-between px-3.5 py-2 rounded-xl bg-zinc-50/50 dark:bg-zinc-900/30 border border-zinc-100 dark:border-zinc-800/40">
       <div className="flex items-center gap-2">
-        <span className="text-zinc-400 dark:text-zinc-500">{icon}</span>
-        <span className="text-[10px] uppercase font-bold text-zinc-400 dark:text-zinc-600 tracking-wider">
+        <span className="text-zinc-400 dark:text-zinc-500 flex items-center">
+          {icon}
+        </span>
+        <span className="text-[10px] font-medium text-zinc-400 tracking-tight">
           {label}
         </span>
       </div>
-      <span className="text-xs text-zinc-700 dark:text-zinc-300 font-bold">
-        {value}
+      <span
+        className={`text-xs ${value ? "text-zinc-800 dark:text-zinc-200 font-medium" : "text-zinc-400 italic font-normal"} ${isMono ? "font-mono" : ""}`}
+      >
+        {value || "Not configured"}
       </span>
     </div>
   );
