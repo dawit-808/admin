@@ -3,7 +3,6 @@ import {
   Routes,
   Route,
   Navigate,
-  Outlet,
 } from "react-router-dom";
 import { useContext } from "react";
 import { AuthContext } from "./context/AuthContext";
@@ -18,7 +17,8 @@ import Auth from "./pages/Auth";
 import Statistics from "./pages/Statistics";
 import Coaches from "./pages/Coaches";
 import CoachProfile from "./pages/CoachProfile";
-import AddMember from "./pages/AddMember";
+import AddMemberPage from "./pages/AddMemberPage";
+import AddCoachPage from "./pages/AddCoachPage";
 
 function AppRoutes() {
   const { loading, authReady } = useContext(AuthContext);
@@ -36,7 +36,8 @@ function AppRoutes() {
         <Route path="/" element={<Statistics />} />
         <Route path="/members" element={<Members />} />
         <Route path="/coaches" element={<Coaches />} />
-        <Route path="/add-member" element={<AddMember />} />
+        <Route path="/add-member" element={<AddMemberPage />} />
+        <Route path="/add-coach" element={<AddCoachPage />} />
       </Route>
 
       {/* Hybrid/Shared Routes */}

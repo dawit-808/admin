@@ -2,15 +2,12 @@ import React, { useState, useRef, useEffect, useContext } from "react";
 import { Link, useLocation, useNavigate } from "react-router-dom";
 import { AuthContext } from "../context/AuthContext";
 import {
-  SpaceDashboard,
   People,
   Sports,
   EventNote,
-  BarChart,
-  Logout,
   HowToReg,
   AddCircleOutline,
-  PersonAdd,
+  Logout,
 } from "@mui/icons-material";
 
 const Sidebar = () => {
@@ -21,7 +18,6 @@ const Sidebar = () => {
   const handleLogout = async () => {
     try {
       await logout();
-
       navigate("/login");
     } catch (err) {
       console.error(err);
@@ -29,22 +25,17 @@ const Sidebar = () => {
   };
 
   return (
-    <aside className="fixed left-0 top-0 h-screen w-16 flex flex-col items-center py-6 bg-[#09090b] border-r border-zinc-800/50 z-[100]">
-      {/* Brand Icon - Minimalist */}
-      <div className="mb-8">
-        <div className="w-8 h-8 rounded-lg bg-blue-600 flex items-center justify-center shadow-lg shadow-blue-900/20">
-          <Sports className="text-white !text-[18px]" />
-        </div>
-      </div>
+    <aside className="fixed left-0 top-0 h-screen w-16 flex flex-col items-center py-5 bg-[#09090b] border-r border-zinc-800/60 z-[100] select-none">
+      {/* Brand Icon - Linked to Home "/" */}
+      <Link
+        to="/"
+        className="mb-8 p-2 rounded-xl border border-zinc-800 bg-zinc-900/50 hover:bg-zinc-800/50 hover:border-zinc-700/80 transition-all duration-300 group shadow-sm"
+      >
+        <Sports className="text-zinc-400 group-hover:text-zinc-100 !text-[18px] transition-colors" />
+      </Link>
 
-      {/* Main Nav Stack - All items share equal vertical spacing */}
-      <div className="flex flex-col gap-4 items-center w-full">
-        <NavItem
-          path="/statistics"
-          icon={BarChart}
-          label="Stats"
-          isActive={location.pathname === "/statistics"}
-        />
+      {/* Main Nav Stack */}
+      <div className="flex flex-col gap-3.5 items-center w-full px-2">
         <NavItem
           path="/members"
           icon={People}
@@ -72,24 +63,24 @@ const Sidebar = () => {
             {
               label: "Add Member",
               path: "/add-member",
-              icon: <People className="!text-[16px] cursor-pointer" />,
+              icon: <People className="!text-[15px]" />,
             },
             {
-              label: "Add Schedule",
-              path: "/add-schedule",
-              icon: <EventNote className="!text-[16px] cursor-pointer" />,
+              label: "Add Coach",
+              path: "/add-coach",
+              icon: <EventNote className="!text-[15px]" />,
             },
           ]}
         />
       </div>
 
-      {/* Logout - Pinned to bottom */}
-      <div className="mt-auto pt-6 border-t border-zinc-800/50 w-full flex justify-center">
+      {/* Logout - Bottom Pinned */}
+      <div className="mt-auto w-full px-3 pt-4 border-t border-zinc-800/60 flex justify-center">
         <button
           onClick={handleLogout}
-          className="group relative p-2 text-zinc-500 hover:text-rose-400 transition-colors cursor-pointer"
+          className="group relative w-10 h-10 flex items-center justify-center rounded-xl text-zinc-500 hover:text-rose-400 hover:bg-rose-500/5 transition-all duration-200 cursor-pointer"
         >
-          <Logout className="!text-[20px]" />
+          <Logout className="!text-[18px]" />
           <Tooltip label="Logout" />
         </button>
       </div>
@@ -97,23 +88,38 @@ const Sidebar = () => {
   );
 };
 
-// Standard Nav Link
-const NavItem = ({ path, icon: Icon, label, isActive }) => (
-  <Link to={path} className="relative group flex items-center justify-center">
+// Premium Nav Link Component
+const NavItem = ({ path, icon: Icon, label, isActive, badge }) => (
+  <Link
+    to={path}
+    className="relative group w-10 h-10 flex items-center justify-center"
+  >
+    {/* Active Ambient Indicator Bar */}
+    {isActive && (
+      <div className="absolute left-0 w-[3px] h-5 bg-zinc-200 rounded-r-full" />
+    )}
+
     <div
-      className={`p-2 rounded-lg transition-all duration-200 ${
+      className={`w-full h-full flex items-center justify-center rounded-xl transition-all duration-200 relative ${
         isActive
-          ? "bg-zinc-800 text-white"
-          : "text-zinc-500 hover:text-zinc-200"
+          ? "bg-zinc-800/80 text-zinc-100 border border-zinc-700/50"
+          : "text-zinc-400 hover:text-zinc-200 hover:bg-zinc-900"
       }`}
     >
-      <Icon className="!text-[20px]" />
+      <Icon className="!text-[18px]" />
+
+      {/* Dynamic Counter/Badge */}
+      {badge && (
+        <span className="absolute -top-1.5 -right-1.5 min-w-[16px] h-4 px-1 flex items-center justify-center bg-zinc-100 text-[#09090b] font-semibold text-[9px] rounded-full ring-2 ring-[#09090b]">
+          {badge}
+        </span>
+      )}
     </div>
     <Tooltip label={label} />
   </Link>
 );
 
-// Integrated Action Item (Dropdown)
+// High-end Dropdown Menu Action Button
 const ActionItem = ({ icon: Icon, label, header, items }) => {
   const [isOpen, setIsOpen] = useState(false);
   const containerRef = useRef(null);
@@ -128,24 +134,24 @@ const ActionItem = ({ icon: Icon, label, header, items }) => {
   }, []);
 
   return (
-    <div className="relative flex justify-center group" ref={containerRef}>
+    <div className="relative w-10 h-10 flex justify-center" ref={containerRef}>
       <button
         onClick={() => setIsOpen(!isOpen)}
-        className={`p-2 rounded-lg transition-all duration-200 ${
+        className={`w-full h-full flex items-center justify-center rounded-xl transition-all duration-200 cursor-pointer ${
           isOpen
-            ? "bg-zinc-800 text-blue-400"
-            : "text-zinc-500 hover:text-zinc-200"
+            ? "bg-zinc-800 text-zinc-100 border border-zinc-700/50"
+            : "text-zinc-400 hover:text-zinc-200 hover:bg-zinc-900"
         }`}
       >
-        <Icon className="!text-[20px]" />
+        <Icon className="!text-[18px]" />
       </button>
 
       {!isOpen && <Tooltip label={label} />}
 
       {isOpen && (
-        <div className="absolute left-full top-0 ml-3 w-44 bg-[#0c0c0e] border border-zinc-800 rounded-lg shadow-2xl py-1.5 animate-in fade-in slide-in-from-left-1 duration-150 z-[120]">
-          <div className="px-3 py-1.5 mb-1 border-b border-zinc-800/50">
-            <p className="text-[10px] font-bold text-zinc-600 uppercase tracking-widest">
+        <div className="absolute left-full top-0 ml-3 w-48 bg-[#0c0c0e] border border-zinc-800/80 rounded-xl shadow-xl py-1.5 animate-in fade-in slide-in-from-left-1 duration-150 z-[120]">
+          <div className="px-3 py-1 mb-1">
+            <p className="text-[9px] font-medium text-zinc-500 uppercase tracking-wider">
               {header}
             </p>
           </div>
@@ -154,9 +160,11 @@ const ActionItem = ({ icon: Icon, label, header, items }) => {
               key={item.path}
               to={item.path}
               onClick={() => setIsOpen(false)}
-              className="flex items-center gap-2.5 px-3 py-2 text-[12px] text-zinc-400 hover:bg-zinc-800 hover:text-white transition-colors"
+              className="flex items-center gap-2.5 px-3 py-1.5 text-[12px] text-zinc-400 hover:bg-zinc-900 hover:text-zinc-100 transition-colors"
             >
-              <span className="text-zinc-500">{item.icon}</span>
+              <span className="text-zinc-500 flex items-center">
+                {item.icon}
+              </span>
               {item.label}
             </Link>
           ))}
@@ -166,8 +174,9 @@ const ActionItem = ({ icon: Icon, label, header, items }) => {
   );
 };
 
+// Tooltip refinement
 const Tooltip = ({ label }) => (
-  <span className="absolute left-12 px-2 py-1 bg-zinc-900 border border-zinc-800 text-zinc-200 text-[11px] font-medium rounded opacity-0 group-hover:opacity-100 translate-x-1 group-hover:translate-x-0 transition-all pointer-events-none whitespace-nowrap z-[110]">
+  <span className="absolute left-14 px-2 py-1 bg-zinc-950 border border-zinc-800 text-zinc-300 text-[10px] font-medium rounded-md opacity-0 group-hover:opacity-100 translate-x-1 group-hover:translate-x-0 transition-all pointer-events-none whitespace-nowrap z-[110] shadow-md">
     {label}
   </span>
 );

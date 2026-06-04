@@ -70,9 +70,6 @@ function AddMembers({ isOpen, onClose, onSuccess }) {
             <h2 className="text-lg font-semibold text-zinc-900 dark:text-white tracking-tight">
               New Member
             </h2>
-            <p className="text-xs text-zinc-500 mt-1">
-              Complete the onboarding flow.
-            </p>
           </div>
 
           <nav className="space-y-1">
