@@ -19,6 +19,7 @@ import Coaches from "./pages/Coaches";
 import CoachProfile from "./pages/CoachProfile";
 import AddMemberPage from "./pages/AddMemberPage";
 import AddCoachPage from "./pages/AddCoachPage";
+import MemberProfile from "./pages/MemberProfile";
 
 function AppRoutes() {
   const { loading, authReady } = useContext(AuthContext);
@@ -41,6 +42,7 @@ function AppRoutes() {
       </Route>
 
       {/* Hybrid/Shared Routes */}
+      <Route path="/profile/:id" element={<MemberProfile />} />
       <Route path="/coaches/:id" element={<CoachProfile />} />
 
       {/* Catch-all: Redirect unknown to Dashboard */}

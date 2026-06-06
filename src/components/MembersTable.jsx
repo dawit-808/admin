@@ -2,6 +2,7 @@ import React from "react";
 import SearchIcon from "@mui/icons-material/Search";
 import Pagination from "@mui/material/Pagination";
 import MoreVertIcon from "@mui/icons-material/MoreVert";
+import { useNavigate } from "react-router-dom";
 
 function MembersTable({
   members = [],
@@ -13,6 +14,8 @@ function MembersTable({
   searchTerm,
   setSearchTerm,
 }) {
+  const navigate = useNavigate();
+
   return (
     <div className="bg-white dark:bg-[#09090b] border border-zinc-200 dark:border-zinc-800/80 rounded-2xl overflow-hidden shadow-sm transition-all duration-300">
       {/* ── HEADER ── */}
@@ -110,7 +113,10 @@ function MembersTable({
                           {initial}
                         </div>
                         <div className="flex flex-col">
-                          <span className="text-sm font-medium text-zinc-900 dark:text-zinc-100">
+                          <span
+                            onClick={() => navigate(`/profile/${m.id}`)}
+                            className=" text-sm font-medium text-zinc-900 dark:text-zinc-100 hover:text-blue-600 dark:hover:text-blue-400 cursor-pointer transition-colors"
+                          >
                             {m.name}
                           </span>
                           <span className="text-[11px] text-zinc-400 font-mono mt-0.5">
