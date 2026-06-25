@@ -1,12 +1,76 @@
-# React + Vite
+# Gym Admin Dashboard
 
-This template provides a minimal setup to get React working in Vite with HMR and some ESLint rules.
+A responsive admin dashboard for managing gym members and subscriptions, built with React and a clean MUI + Tailwind interface. Designed as the frontend client for a separate gym-management backend API.
 
-Currently, two official plugins are available:
+## Features
 
-- [@vitejs/plugin-react](https://github.com/vitejs/vite-plugin-react/blob/main/packages/plugin-react) uses [Babel](https://babeljs.io/) for Fast Refresh
-- [@vitejs/plugin-react-swc](https://github.com/vitejs/vite-plugin-react/blob/main/packages/plugin-react-swc) uses [SWC](https://swc.rs/) for Fast Refresh
+- 🏋️ **Member Management** — add, view, update, and track gym members
+- 💳 **Subscription Tracking** — manage membership plans and renewal status
+- 📷 **Profile Photo Capture** — capture or upload member ID/profile photos directly from the browser using the device webcam
+- 🔐 **Multi-page Navigation** — client-side routing across dashboard sections
+- 📡 **REST API Integration** — communicates with a separate backend service via Axios
+- 🎨 **Modern UI** — built with Material UI components styled on top of Tailwind CSS
 
-## Expanding the ESLint configuration
+## Tech Stack
 
-If you are developing a production application, we recommend using TypeScript with type-aware lint rules enabled. Check out the [TS template](https://github.com/vitejs/vite/tree/main/packages/create-vite/template-react-ts) for information on how to integrate TypeScript and [`typescript-eslint`](https://typescript-eslint.io) in your project.
+| Category | Technology |
+|---|---|
+| Framework | React 19 + Vite 7 |
+| Styling | Tailwind CSS v4, Material UI (MUI) v7 |
+| Routing | React Router v7 |
+| HTTP Client | Axios |
+| Camera/Photo Capture | react-webcam |
+| Icons | Lucide React, React Icons |
+| Linting | ESLint |
+
+## Architecture
+
+This repository contains **only the frontend**. It is designed to be paired with a separate backend API (gym member/subscription data, auth, etc.) that this app communicates with over REST using Axios.
+
+## Getting Started
+
+### Prerequisites
+- Node.js 18+
+- A running instance of the [backend API](#) *(link your backend repo here)*
+
+### Installation
+
+```bash
+git clone https://github.com/dawit-808/admin.git
+cd admin
+npm install
+```
+
+### Configure the API
+
+Update the Axios base URL / environment variable to point to your backend API instance (e.g. via a `.env` file or the relevant config/service file in `src/`).
+
+### Run locally
+
+```bash
+npm run dev
+```
+
+### Build for production
+
+```bash
+npm run build
+npm run preview
+```
+
+## Available Scripts
+
+| Script | Description |
+|---|---|
+| `npm run dev` | Start the Vite dev server with HMR |
+| `npm run build` | Build for production |
+| `npm run preview` | Preview the production build locally |
+| `npm run lint` | Run ESLint |
+
+## Project Status
+
+🚧 Frontend client — pairs with a separate backend service (not included in this repo).
+
+## License
+
+This project currently has no license specified.
