@@ -4,12 +4,12 @@ A responsive admin dashboard for managing gym members and subscriptions, built w
 
 ## Features
 
-- 🏋️ **Member Management** — add, view, update, and track gym members
-- 💳 **Subscription Tracking** — manage membership plans and renewal status
-- 📷 **Profile Photo Capture** — capture or upload member ID/profile photos directly from the browser using the device webcam
-- 🔐 **Multi-page Navigation** — client-side routing across dashboard sections
-- 📡 **REST API Integration** — communicates with a separate backend service via Axios
-- 🎨 **Modern UI** — built with Material UI components styled on top of Tailwind CSS
+- **Member Management** — add, view, update, and track gym members
+- **Subscription Tracking** — manage membership plans and renewal status
+- **Profile Photo Capture** — capture or upload member ID/profile photos directly from the browser using the device webcam
+- **Multi-page Navigation** — client-side routing across dashboard sections
+- **REST API Integration** — communicates with a separate backend service via Axios
+- **Modern UI** — built with Material UI components styled on top of Tailwind CSS
 
 ## Tech Stack
 
@@ -69,7 +69,7 @@ npm run preview
 
 ## Project Status
 
-🚧 Frontend client — pairs with a separate backend service (not included in this repo).
+Frontend client — pairs with a separate backend service (not included in this repo).
 
 ## License
 
