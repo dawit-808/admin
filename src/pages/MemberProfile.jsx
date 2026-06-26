@@ -18,6 +18,7 @@ import MonitorWeightIcon from "@mui/icons-material/MonitorWeight";
 import HeightIcon from "@mui/icons-material/Height";
 import BloodtypeIcon from "@mui/icons-material/Bloodtype";
 import EmergencyIcon from "@mui/icons-material/Emergency";
+import QRCode from "react-qr-code";
 
 function MemberProfile() {
   const { id } = useParams();
@@ -46,6 +47,7 @@ function MemberProfile() {
   if (!profile) {
     return (
       <div className="min-h-screen bg-zinc-50 dark:bg-[#030303] flex items-center justify-center p-6">
+        <div className="relative -mt-14 flex flex-col sm:flex-row sm:items-end gap-5"></div>
         <div className="text-center max-w-sm">
           <p className="text-zinc-800 dark:text-zinc-200 text-sm font-medium">
             Member profile not found
@@ -84,32 +86,52 @@ function MemberProfile() {
 
           <div className="px-8 pb-10">
             {/* PROFILE TOP */}
-            <div className="relative -mt-14 flex flex-col sm:flex-row sm:items-end gap-5">
-              <div className="w-28 h-28 rounded-full overflow-hidden border-4 border-white dark:border-[#09090b] bg-zinc-100 dark:bg-zinc-900 shadow-sm shrink-0 flex items-center justify-center">
-                {profile.url ? (
-                  <img
-                    src={profile.url}
-                    alt={profile.name}
-                    className="w-full h-full object-cover"
-                  />
-                ) : (
-                  <PersonIcon sx={{ fontSize: 40, color: "#a1a1aa" }} />
-                )}
+            <div className="relative -mt-14 flex flex-col lg:flex-row lg:items-end lg:justify-between gap-6">
+              <div className="flex flex-col sm:flex-row sm:items-end gap-5">
+                {/* Profile Image */}
+                <div className="w-28 h-28 rounded-full overflow-hidden border-4 border-white dark:border-[#09090b] bg-zinc-100 dark:bg-zinc-900 shadow-sm shrink-0 flex items-center justify-center">
+                  {profile.url ? (
+                    <img
+                      src={profile.url}
+                      alt={profile.name}
+                      className="w-full h-full object-cover"
+                    />
+                  ) : (
+                    <PersonIcon sx={{ fontSize: 40, color: "#a1a1aa" }} />
+                  )}
+                </div>
+
+                {/* Name */}
+                <div className="pb-2">
+                  <h1 className="text-2xl font-semibold text-zinc-900 dark:text-white tracking-tight">
+                    {profile.name}
+                  </h1>
+
+                  <div className="flex flex-wrap items-center gap-2 mt-2 text-[10px] uppercase font-mono font-bold tracking-wide text-zinc-400">
+                    <span className="bg-zinc-100 dark:bg-zinc-900 border border-zinc-200 dark:border-zinc-800 px-2 py-0.5 rounded text-zinc-700 dark:text-zinc-300">
+                      ID // {profile.ras_id}
+                    </span>
+
+                    <span>•</span>
+
+                    <span>{profile.gender || "Unspecified"}</span>
+                  </div>
+                </div>
               </div>
 
-              <div className="pb-2">
-                <h1 className="text-2xl font-semibold text-zinc-900 dark:text-white tracking-tight">
-                  {profile.name}
-                </h1>
+              {/* QR Code */}
+              <div className="flex justify-start lg:justify-end">
+                <div className="bg-white dark:bg-zinc-950 rounded-2xl p-4 border border-zinc-200 dark:border-zinc-800 shadow-sm">
+                  <QRCode
+                    value={`${window.location.origin}/members/${profile.id}`}
+                    size={120}
+                    bgColor="transparent"
+                    fgColor="#18181b"
+                  />
 
-                <div className="flex flex-wrap items-center gap-2 mt-2 text-[10px] uppercase font-mono font-bold tracking-wide text-zinc-400">
-                  <span className="bg-zinc-100 dark:bg-zinc-900 border border-zinc-200 dark:border-zinc-800 px-2 py-0.5 rounded text-zinc-700 dark:text-zinc-300">
-                    ID // {profile.ras_id}
-                  </span>
-
-                  <span>•</span>
-
-                  <span>{profile.gender || "Unspecified"}</span>
+                  <p className="text-center mt-3 text-[10px] uppercase tracking-wider text-zinc-400 font-medium">
+                    Scan Member
+                  </p>
                 </div>
               </div>
             </div>
@@ -139,8 +161,8 @@ function MemberProfile() {
                     icon={<CakeIcon sx={{ fontSize: 14 }} />}
                     label="Date of Birth"
                     value={
-                      profile.birthDate
-                        ? new Date(profile.birthDate).toLocaleDateString()
+                      profile.b_date
+                        ? new Date(profile.b_date).toLocaleDateString()
                         : null
                     }
                   />
