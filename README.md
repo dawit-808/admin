@@ -13,15 +13,14 @@ A responsive admin dashboard for managing gym members and subscriptions, built w
 
 ## Tech Stack
 
-| Category | Technology |
-|---|---|
-| Framework | React 19 + Vite 7 |
-| Styling | Tailwind CSS v4, Material UI (MUI) v7 |
-| Routing | React Router v7 |
-| HTTP Client | Axios |
-| Camera/Photo Capture | react-webcam |
-| Icons | Lucide React, React Icons |
-| Linting | ESLint |
+ Category | Technology
+Framework - React 19 + Vite 7 
+Styling - Tailwind CSS v4, Material UI (MUI) v7 
+Routing - React Router v7
+HTTP Client - Axios
+Camera/Photo Capture - react-webcam 
+Icons - Lucide React, React Icons 
+Linting - ESLint 
 
 ## Architecture
 
@@ -60,12 +59,11 @@ npm run preview
 
 ## Available Scripts
 
-| Script | Description |
-|---|---|
-| `npm run dev` | Start the Vite dev server with HMR |
-| `npm run build` | Build for production |
-| `npm run preview` | Preview the production build locally |
-| `npm run lint` | Run ESLint |
+ Script | Description 
+`npm run dev` Start the Vite dev server with HMR
+`npm run build` Build for production
+`npm run preview` Preview the production build locally
+`npm run lint` Run ESLint
 
 ## Project Status
 
