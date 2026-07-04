@@ -6,7 +6,6 @@ import PhoneIcon from "@mui/icons-material/Phone";
 import CircularProgress from "@mui/material/CircularProgress";
 import CheckCircleIcon from "@mui/icons-material/CheckCircle";
 import CancelIcon from "@mui/icons-material/Cancel";
-import AccessTimeIcon from "@mui/icons-material/AccessTime";
 import Sidebar from "../components/Sidebar";
 import ThemeToggle from "../components/ThemeToggle";
 
@@ -16,7 +15,7 @@ function PaymentVerification() {
   const [phoneNumber, setPhoneNumber] = useState("");
 
   const [loading, setLoading] = useState(false);
-  const [result, setResult] = useState(null);
+  const [result, setResult] = useState(null); // Will hold { success: true/false, message: "..." }
   const [error, setError] = useState("");
 
   const verifyPayment = async () => {
@@ -24,7 +23,6 @@ function PaymentVerification() {
     const cleanRef = reference.trim();
     const cleanPhone = phoneNumber.trim();
 
-    // Field validations
     if (!cleanRasId || !cleanRef || !cleanPhone) {
       setError(
         "All fields (Registry ID, Reference, and Phone Number) are required.",
@@ -37,7 +35,6 @@ function PaymentVerification() {
     setError("");
 
     try {
-      // Universal payload structured exactly to your new API contract
       const payload = {
         memberRasId: cleanRasId,
         reference: cleanRef,
@@ -45,6 +42,8 @@ function PaymentVerification() {
       };
 
       const res = await api.post("/payments/verify", payload);
+
+      // Store the backend response exactly as it arrives
       setResult(res.data);
     } catch (err) {
       console.error(err);
@@ -54,31 +53,34 @@ function PaymentVerification() {
     }
   };
 
-  const StatusUI = ({ status }) => {
-    switch (status) {
-      case "PAID":
-      case "SUCCESS":
-        return (
+  // ── UPDATED STATUS UI ──
+  // Reads the exact boolean "success" value returned by your server
+  const StatusUI = ({ success, message }) => {
+    if (success) {
+      return (
+        <div className="space-y-2">
           <div className="flex items-center gap-2 text-emerald-500 font-medium text-sm">
             <CheckCircleIcon sx={{ fontSize: 18 }} />
-            Payment Verified
+            Payment Confirmed
           </div>
-        );
-      case "PENDING":
-        return (
-          <div className="flex items-center gap-2 text-yellow-500 font-medium text-sm">
-            <AccessTimeIcon sx={{ fontSize: 18 }} />
-            Pending Verification
-          </div>
-        );
-      default:
-        return (
-          <div className="flex items-center gap-2 text-red-500 font-medium text-sm">
-            <CancelIcon sx={{ fontSize: 18 }} />
-            Verification Failed
-          </div>
-        );
+          <p className="text-xs text-zinc-600 dark:text-zinc-400 font-medium bg-emerald-500/5 border border-emerald-500/10 p-2.5 rounded-lg">
+            {message}
+          </p>
+        </div>
+      );
     }
+
+    return (
+      <div className="space-y-2">
+        <div className="flex items-center gap-2 text-red-500 font-medium text-sm">
+          <CancelIcon sx={{ fontSize: 18 }} />
+          Verification Failed
+        </div>
+        <p className="text-xs text-zinc-600 dark:text-zinc-400 font-medium bg-red-500/5 border border-red-500/10 p-2.5 rounded-lg">
+          {message || "The transaction could not be verified."}
+        </p>
+      </div>
+    );
   };
 
   return (
@@ -110,7 +112,7 @@ function PaymentVerification() {
                 type="text"
                 value={memberRasId}
                 onChange={(e) => setMemberRasId(e.target.value)}
-                placeholder="e.g., RAS001"
+                placeholder="e.g., RAST0349"
                 className="w-full pl-9 pr-4 py-2 rounded-xl border border-zinc-200 dark:border-zinc-800 bg-transparent text-xs text-zinc-900 dark:text-white placeholder-zinc-400 focus:outline-none focus:ring-2 focus:ring-zinc-900/5 dark:focus:ring-white/10 focus:border-zinc-400 dark:focus:border-zinc-700 transition-all"
               />
             </div>
@@ -130,7 +132,7 @@ function PaymentVerification() {
                 type="tel"
                 value={phoneNumber}
                 onChange={(e) => setPhoneNumber(e.target.value)}
-                placeholder="e.g., 251912345678"
+                placeholder="e.g., 251922090582"
                 className="w-full pl-9 pr-4 py-2 rounded-xl border border-zinc-200 dark:border-zinc-800 bg-transparent text-xs text-zinc-900 dark:text-white placeholder-zinc-400 focus:outline-none focus:ring-2 focus:ring-zinc-900/5 dark:focus:ring-white/10 focus:border-zinc-400 dark:focus:border-zinc-700 transition-all"
               />
             </div>
@@ -150,7 +152,7 @@ function PaymentVerification() {
                 type="text"
                 value={reference}
                 onChange={(e) => setReference(e.target.value)}
-                placeholder="Telebirr / CBE Reference (e.g., FT25244MV3ZX)"
+                placeholder="e.g., FT25244MV3ZX"
                 className="w-full pl-9 pr-4 py-2 rounded-xl border border-zinc-200 dark:border-zinc-800 bg-transparent text-xs text-zinc-900 dark:text-white placeholder-zinc-400 focus:outline-none focus:ring-2 focus:ring-zinc-900/5 dark:focus:ring-white/10 focus:border-zinc-400 dark:focus:border-zinc-700 transition-all"
               />
             </div>
@@ -166,39 +168,24 @@ function PaymentVerification() {
           {loading ? (
             <>
               <CircularProgress size={14} color="inherit" />
-              Processing request...
+              Processing verification...
             </>
           ) : (
             "Verify Transaction"
           )}
         </button>
 
-        {/* ERROR SUMMARY */}
+        {/* CATCH BLOCK ERROR DISPLAY */}
         {error && (
           <p className="text-red-500 font-medium text-[11px] mt-3 bg-red-500/5 border border-red-500/10 p-2 rounded-lg">
             {error}
           </p>
         )}
 
-        {/* ACTION RESULT PREVIEW */}
+        {/* DYNAMIC SUCCESS/FAIL BLOCKS */}
         {result && (
-          <div className="mt-5 p-4 border border-zinc-100 dark:border-zinc-800/80 bg-zinc-50/50 dark:bg-zinc-900/20 rounded-xl space-y-3">
-            <StatusUI status={result.status} />
-
-            <div className="text-[11px] text-zinc-500 dark:text-zinc-400 space-y-1.5 font-mono pt-1 border-t border-zinc-100 dark:border-zinc-800/60">
-              <div className="flex justify-between">
-                <span>Amount:</span>
-                <span className="text-zinc-800 dark:text-zinc-200 font-medium">
-                  {result.amount || "—"} ETB
-                </span>
-              </div>
-              <div className="flex justify-between">
-                <span>Sender:</span>
-                <span className="text-zinc-800 dark:text-zinc-200 font-medium">
-                  {result.senderName || "—"}
-                </span>
-              </div>
-            </div>
+          <div className="mt-5 p-4 border border-zinc-100 dark:border-zinc-800/80 bg-zinc-50/50 dark:bg-zinc-900/20 rounded-xl">
+            <StatusUI success={result.success} message={result.message} />
           </div>
         )}
       </div>
