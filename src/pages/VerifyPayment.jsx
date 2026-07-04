@@ -2,6 +2,7 @@ import { useState } from "react";
 import api from "../api/api";
 import SearchIcon from "@mui/icons-material/Search";
 import BadgeIcon from "@mui/icons-material/Badge";
+import PhoneIcon from "@mui/icons-material/Phone";
 import CircularProgress from "@mui/material/CircularProgress";
 import CheckCircleIcon from "@mui/icons-material/CheckCircle";
 import CancelIcon from "@mui/icons-material/Cancel";
@@ -10,21 +11,24 @@ import Sidebar from "../components/Sidebar";
 import ThemeToggle from "../components/ThemeToggle";
 
 function PaymentVerification() {
-  const [memberId, setMemberId] = useState("");
-  const [provider, setProvider] = useState("telebirr");
-  const [telebirrRef, setTelebirrRef] = useState("");
-  const [cbeRef, setCbeRef] = useState("");
-  const [cbeAccountSuffix, setCbeAccountSuffix] = useState("");
+  const [memberRasId, setMemberRasId] = useState("");
+  const [reference, setReference] = useState("");
+  const [phoneNumber, setPhoneNumber] = useState("");
 
   const [loading, setLoading] = useState(false);
   const [result, setResult] = useState(null);
   const [error, setError] = useState("");
 
   const verifyPayment = async () => {
-    const cleanMemberId = memberId.trim();
+    const cleanRasId = memberRasId.trim();
+    const cleanRef = reference.trim();
+    const cleanPhone = phoneNumber.trim();
 
-    if (!cleanMemberId) {
-      setError("Please enter a valid Member ID before verifying.");
+    // Field validations
+    if (!cleanRasId || !cleanRef || !cleanPhone) {
+      setError(
+        "All fields (Registry ID, Reference, and Phone Number) are required.",
+      );
       return;
     }
 
@@ -33,24 +37,12 @@ function PaymentVerification() {
     setError("");
 
     try {
-      // Handles both purely numeric inputs and strings containing characters
-      const parsedMemberId = /^\d+$/.test(cleanMemberId)
-        ? Number(cleanMemberId)
-        : cleanMemberId;
-
-      let payload = {
-        memberId: parsedMemberId,
-        paymentMethod: provider,
+      // Universal payload structured exactly to your new API contract
+      const payload = {
+        memberRasId: cleanRasId,
+        reference: cleanRef,
+        phoneNumber: cleanPhone,
       };
-
-      if (provider === "telebirr") {
-        payload.reference = telebirrRef.trim();
-      }
-
-      if (provider === "cbe") {
-        payload.reference = cbeRef.trim();
-        payload.accountSuffix = cbeAccountSuffix.trim();
-      }
 
       const res = await api.post("/payments/verify", payload);
       setResult(res.data);
@@ -99,138 +91,89 @@ function PaymentVerification() {
           Payment Verification
         </h1>
         <p className="text-xs text-zinc-400 mt-0.5">
-          Verify digital transaction details manually
+          Universal verification gateway
         </p>
 
-        {/* MEMBER ID INPUT */}
-        <div className="mt-5">
-          <label className="block text-[11px] font-medium text-zinc-500 dark:text-zinc-400 mb-1.5 uppercase tracking-wider">
-            Target Member Profile
-          </label>
-          <div className="relative">
-            <BadgeIcon
-              className="absolute left-3 top-2.5 text-zinc-400"
-              sx={{ fontSize: 16 }}
-            />
-            <input
-              type="text"
-              value={memberId}
-              onChange={(e) => setMemberId(e.target.value)}
-              placeholder="Enter Member ID (e.g., 1, RAS-402, or MEM/89)"
-              className="w-full pl-9 pr-4 py-2 rounded-xl border border-zinc-200 dark:border-zinc-800 bg-transparent text-xs text-zinc-900 dark:text-white placeholder-zinc-400 focus:outline-none focus:ring-2 focus:ring-zinc-900/5 dark:focus:ring-white/10 focus:border-zinc-400 dark:focus:border-zinc-700 transition-all"
-            />
+        {/* INPUT FIELDS */}
+        <div className="mt-5 space-y-4">
+          {/* MEMBER RAS ID */}
+          <div>
+            <label className="block text-[11px] font-medium text-zinc-500 dark:text-zinc-400 mb-1.5 uppercase tracking-wider">
+              Member Registry ID
+            </label>
+            <div className="relative">
+              <BadgeIcon
+                className="absolute left-3 top-2.5 text-zinc-400"
+                sx={{ fontSize: 16 }}
+              />
+              <input
+                type="text"
+                value={memberRasId}
+                onChange={(e) => setMemberRasId(e.target.value)}
+                placeholder="e.g., RAS001"
+                className="w-full pl-9 pr-4 py-2 rounded-xl border border-zinc-200 dark:border-zinc-800 bg-transparent text-xs text-zinc-900 dark:text-white placeholder-zinc-400 focus:outline-none focus:ring-2 focus:ring-zinc-900/5 dark:focus:ring-white/10 focus:border-zinc-400 dark:focus:border-zinc-700 transition-all"
+              />
+            </div>
           </div>
-        </div>
 
-        {/* PROVIDER SELECT */}
-        <div className="mt-4">
-          <label className="block text-[11px] font-medium text-zinc-500 dark:text-zinc-400 mb-1.5 uppercase tracking-wider">
-            Payment Processor
-          </label>
-          <div className="flex gap-2 p-1 bg-zinc-100 dark:bg-zinc-900 rounded-xl">
-            <button
-              type="button"
-              onClick={() => {
-                setProvider("telebirr");
-                setError("");
-                setResult(null);
-              }}
-              className={`flex-1 py-1.5 rounded-lg text-xs font-medium transition-all cursor-pointer ${
-                provider === "telebirr"
-                  ? "bg-white text-zinc-900 shadow-sm dark:bg-zinc-800 dark:text-white"
-                  : "text-zinc-500 hover:text-zinc-900 dark:hover:text-zinc-300"
-              }`}
-            >
-              Telebirr
-            </button>
-
-            <button
-              type="button"
-              onClick={() => {
-                setProvider("cbe");
-                setError("");
-                setResult(null);
-              }}
-              className={`flex-1 py-1.5 rounded-lg text-xs font-medium transition-all cursor-pointer ${
-                provider === "cbe"
-                  ? "bg-white text-zinc-900 shadow-sm dark:bg-zinc-800 dark:text-white"
-                  : "text-zinc-500 hover:text-zinc-900 dark:hover:text-zinc-300"
-              }`}
-            >
-              CBE
-            </button>
+          {/* PHONE NUMBER */}
+          <div>
+            <label className="block text-[11px] font-medium text-zinc-500 dark:text-zinc-400 mb-1.5 uppercase tracking-wider">
+              Phone Number
+            </label>
+            <div className="relative">
+              <PhoneIcon
+                className="absolute left-3 top-2.5 text-zinc-400"
+                sx={{ fontSize: 16 }}
+              />
+              <input
+                type="tel"
+                value={phoneNumber}
+                onChange={(e) => setPhoneNumber(e.target.value)}
+                placeholder="e.g., 251912345678"
+                className="w-full pl-9 pr-4 py-2 rounded-xl border border-zinc-200 dark:border-zinc-800 bg-transparent text-xs text-zinc-900 dark:text-white placeholder-zinc-400 focus:outline-none focus:ring-2 focus:ring-zinc-900/5 dark:focus:ring-white/10 focus:border-zinc-400 dark:focus:border-zinc-700 transition-all"
+              />
+            </div>
           </div>
-        </div>
 
-        {/* PROVIDER SPECIFIC TRANSACTION INPUTS */}
-        <div className="mt-4 space-y-3">
-          <label className="block text-[11px] font-medium text-zinc-500 dark:text-zinc-400 -mb-1.5 uppercase tracking-wider">
-            Transaction Details
-          </label>
-
-          {provider === "telebirr" && (
+          {/* TRANSACTION REFERENCE */}
+          <div>
+            <label className="block text-[11px] font-medium text-zinc-500 dark:text-zinc-400 mb-1.5 uppercase tracking-wider">
+              Transaction Reference
+            </label>
             <div className="relative">
               <SearchIcon
                 className="absolute left-3 top-2.5 text-zinc-400"
                 sx={{ fontSize: 16 }}
               />
               <input
-                value={telebirrRef}
-                onChange={(e) => setTelebirrRef(e.target.value)}
-                placeholder="Telebirr reference (e.g., CE626EJRNS)"
+                type="text"
+                value={reference}
+                onChange={(e) => setReference(e.target.value)}
+                placeholder="Telebirr / CBE Reference (e.g., FT25244MV3ZX)"
                 className="w-full pl-9 pr-4 py-2 rounded-xl border border-zinc-200 dark:border-zinc-800 bg-transparent text-xs text-zinc-900 dark:text-white placeholder-zinc-400 focus:outline-none focus:ring-2 focus:ring-zinc-900/5 dark:focus:ring-white/10 focus:border-zinc-400 dark:focus:border-zinc-700 transition-all"
               />
             </div>
-          )}
-
-          {provider === "cbe" && (
-            <>
-              <div className="relative">
-                <SearchIcon
-                  className="absolute left-3 top-2.5 text-zinc-400"
-                  sx={{ fontSize: 16 }}
-                />
-                <input
-                  value={cbeRef}
-                  onChange={(e) => setCbeRef(e.target.value)}
-                  placeholder="CBE reference (e.g., FT25244MV3ZX)"
-                  className="w-full pl-9 pr-4 py-2 rounded-xl border border-zinc-200 dark:border-zinc-800 bg-transparent text-xs text-zinc-900 dark:text-white placeholder-zinc-400 focus:outline-none focus:ring-2 focus:ring-zinc-900/5 dark:focus:ring-white/10 focus:border-zinc-400 dark:focus:border-zinc-700 transition-all"
-                />
-              </div>
-
-              <div className="relative">
-                <SearchIcon
-                  className="absolute left-3 top-2.5 text-zinc-400"
-                  sx={{ fontSize: 16 }}
-                />
-                <input
-                  value={cbeAccountSuffix}
-                  onChange={(e) => setCbeAccountSuffix(e.target.value)}
-                  placeholder="Last 8 digits of account (e.g., 18205729)"
-                  className="w-full pl-9 pr-4 py-2 rounded-xl border border-zinc-200 dark:border-zinc-800 bg-transparent text-xs text-zinc-900 dark:text-white placeholder-zinc-400 focus:outline-none focus:ring-2 focus:ring-zinc-900/5 dark:focus:ring-white/10 focus:border-zinc-400 dark:focus:border-zinc-700 transition-all"
-                />
-              </div>
-            </>
-          )}
+          </div>
         </div>
 
         {/* SUBMIT BUTTON */}
         <button
           onClick={verifyPayment}
           disabled={loading}
-          className="w-full mt-5 flex items-center justify-center gap-2 bg-zinc-900 text-white dark:bg-white dark:text-black py-2 rounded-xl text-xs font-semibold hover:opacity-90 active:scale-[0.99] transition-all disabled:opacity-50 cursor-pointer"
+          className="w-full mt-6 flex items-center justify-center gap-2 bg-zinc-900 text-white dark:bg-white dark:text-black py-2 rounded-xl text-xs font-semibold hover:opacity-90 active:scale-[0.99] transition-all disabled:opacity-50 cursor-pointer"
         >
           {loading ? (
             <>
               <CircularProgress size={14} color="inherit" />
-              Verifying transaction...
+              Processing request...
             </>
           ) : (
-            "Verify Payment"
+            "Verify Transaction"
           )}
         </button>
 
-        {/* ERROR SUMMARY LAYER */}
+        {/* ERROR SUMMARY */}
         {error && (
           <p className="text-red-500 font-medium text-[11px] mt-3 bg-red-500/5 border border-red-500/10 p-2 rounded-lg">
             {error}
@@ -253,12 +196,6 @@ function PaymentVerification() {
                 <span>Sender:</span>
                 <span className="text-zinc-800 dark:text-zinc-200 font-medium">
                   {result.senderName || "—"}
-                </span>
-              </div>
-              <div className="flex justify-between">
-                <span>Provider:</span>
-                <span className="text-zinc-800 dark:text-zinc-200 font-medium uppercase">
-                  {provider}
                 </span>
               </div>
             </div>
