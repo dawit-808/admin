@@ -81,6 +81,7 @@ function Members() {
               limit={limit}
               searchTerm={searchTerm}
               setSearchTerm={setSearchTerm}
+              onSuccess={() => fetchMembers(page, activeSearch)}
             />
           </section>
         </div>

@@ -9,6 +9,7 @@ import {
   AddCircleOutline,
   Logout,
 } from "@mui/icons-material";
+import PaymentIcon from "@mui/icons-material/Payment";
 
 const Sidebar = () => {
   const location = useLocation();
@@ -71,6 +72,12 @@ const Sidebar = () => {
               icon: <EventNote className="!text-[15px]" />,
             },
           ]}
+        />
+        <NavItem
+          path="/verify-payment"
+          icon={PaymentIcon}
+          label="Verify Payment"
+          isActive={location.pathname === "/verify-payment"}
         />
       </div>
 

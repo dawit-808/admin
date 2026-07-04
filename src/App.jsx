@@ -20,6 +20,7 @@ import CoachProfile from "./pages/CoachProfile";
 import AddMemberPage from "./pages/AddMemberPage";
 import AddCoachPage from "./pages/AddCoachPage";
 import MemberProfile from "./pages/MemberProfile";
+import VerifyPayment from "./pages/VerifyPayment";
 
 function AppRoutes() {
   const { loading, authReady } = useContext(AuthContext);
@@ -39,6 +40,7 @@ function AppRoutes() {
         <Route path="/coaches" element={<Coaches />} />
         <Route path="/add-member" element={<AddMemberPage />} />
         <Route path="/add-coach" element={<AddCoachPage />} />
+        <Route path="/verify-payment" element={<VerifyPayment />} />
       </Route>
 
       {/* Hybrid/Shared Routes */}
