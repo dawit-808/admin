@@ -1,9 +1,10 @@
-import { useEffect, useState, useContext } from "react";
+import { useEffect, useState, useContext, useRef } from "react";
 import api from "../api/api";
 import Sidebar from "../components/Sidebar";
 import { AuthContext } from "../context/AuthContext";
 import { useNavigate } from "react-router-dom";
 import ThemeToggle from "../components/ThemeToggle";
+import toast, { Toaster } from "react-hot-toast";
 
 // MUI Icons
 import PhoneIcon from "@mui/icons-material/Phone";
@@ -11,6 +12,7 @@ import BadgeIcon from "@mui/icons-material/Badge";
 import CakeIcon from "@mui/icons-material/Cake";
 import PersonIcon from "@mui/icons-material/Person";
 import MoreVertIcon from "@mui/icons-material/MoreVert";
+import DeleteOutlineIcon from "@mui/icons-material/DeleteOutline";
 
 function Coaches() {
   const { accessToken } = useContext(AuthContext);
@@ -23,6 +25,7 @@ function Coaches() {
       setCoaches(res.data);
     } catch (err) {
       console.error("Failed to fetch coaches:", err);
+      toast.error("Failed to load coaches");
     } finally {
       setLoading(false);
     }
@@ -32,8 +35,25 @@ function Coaches() {
     fetchCoaches();
   }, [accessToken]);
 
+  const handleDeleteCoach = async (id, name) => {
+    // Optimistically remove from UI, roll back on failure
+    const prevCoaches = coaches;
+    setCoaches((cur) => cur.filter((c) => c.id !== id));
+
+    const toastId = toast.loading(`Deleting ${name || "coach"}...`);
+    try {
+      await api.delete(`/coach-service/${id}/fulldelete`);
+      toast.success(`${name || "Coach"} deleted`, { id: toastId });
+    } catch (err) {
+      console.error("Failed to delete coach:", err);
+      setCoaches(prevCoaches);
+      toast.error(`Failed to delete ${name || "coach"}`, { id: toastId });
+    }
+  };
+
   return (
     <div className="min-h-screen bg-zinc-50 dark:bg-[#030303] text-zinc-600 dark:text-zinc-400 font-sans antialiased transition-colors duration-500">
+      <Toaster position="top-right" toastOptions={{ duration: 3000 }} />
       <Sidebar />
       <ThemeToggle />
 
@@ -82,7 +102,11 @@ function Coaches() {
           /* Main Card Grid Display */
           <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
             {coaches.map((coach) => (
-              <CoachCard key={coach.id} coach={coach} />
+              <CoachCard
+                key={coach.id}
+                coach={coach}
+                onDelete={handleDeleteCoach}
+              />
             ))}
           </div>
         )}
@@ -93,20 +117,128 @@ function Coaches() {
 
 /* ── COACH CARD COMPONENT ── */
 
-function CoachCard({ coach }) {
+function CoachCard({ coach, onDelete }) {
   const navigate = useNavigate();
+  const [menuOpen, setMenuOpen] = useState(false);
+  const menuRef = useRef(null);
+
+  useEffect(() => {
+    function handleClickOutside(e) {
+      if (menuRef.current && !menuRef.current.contains(e.target)) {
+        setMenuOpen(false);
+      }
+    }
+    document.addEventListener("mousedown", handleClickOutside);
+    return () => document.removeEventListener("mousedown", handleClickOutside);
+  }, []);
 
   const age = coach.b_date
     ? new Date().getFullYear() - new Date(coach.b_date).getFullYear()
     : null;
 
+  const handleDeleteClick = () => {
+    setMenuOpen(false);
+
+    toast(
+      (t) => (
+        <div className="w-[330px]">
+          {/* Icon */}
+          <div className="mx-auto flex h-14 w-14 items-center justify-center rounded-full bg-red-100 dark:bg-red-500/10">
+            <DeleteOutlineIcon
+              sx={{
+                fontSize: 30,
+                color: "#ef4444",
+              }}
+            />
+          </div>
+
+          {/* Title */}
+          <h3 className="mt-4 text-center text-base font-semibold text-zinc-900 dark:text-white">
+            Delete Coach?
+          </h3>
+
+          {/* Description */}
+          <p className="mt-2 text-center text-sm text-zinc-500 dark:text-zinc-400 leading-relaxed">
+            You're about to permanently remove
+          </p>
+
+          <p className="mt-1 text-center font-semibold text-red-500">
+            {coach.name || "this coach"}
+          </p>
+
+          {/* Warning Box */}
+          <div className="mt-5 rounded-xl border border-red-200 dark:border-red-900 bg-red-50 dark:bg-red-500/5 p-4">
+            <p className="text-xs font-semibold uppercase tracking-wide text-red-500 mb-2">
+              This will remove:
+            </p>
+
+            <ul className="space-y-1 text-xs text-zinc-600 dark:text-zinc-300">
+              <li>• Coach profile</li>
+              <li>• Assigned members</li>
+              <li>• Training records</li>
+              <li>• Related database references</li>
+            </ul>
+          </div>
+
+          <p className="mt-4 text-center text-xs font-medium text-red-500">
+            This action cannot be undone.
+          </p>
+
+          {/* Buttons */}
+          <div className="mt-6 flex gap-3">
+            <button
+              onClick={() => toast.dismiss(t.id)}
+              className="flex-1 rounded-xl border border-zinc-200 dark:border-zinc-700 py-2.5 text-sm font-medium text-zinc-600 dark:text-zinc-300 hover:bg-zinc-100 dark:hover:bg-zinc-800 transition-colors"
+            >
+              Cancel
+            </button>
+
+            <button
+              onClick={() => {
+                toast.dismiss(t.id);
+                onDelete(coach.id, coach.name);
+              }}
+              className="flex-1 rounded-xl bg-red-500 py-2.5 text-sm font-semibold text-white hover:bg-red-600 transition-colors"
+            >
+              Delete Coach
+            </button>
+          </div>
+        </div>
+      ),
+      {
+        duration: 500,
+        style: {
+          borderRadius: "18px",
+          padding: "22px",
+          background: "var(--toast-bg, #fff)",
+          maxWidth: "380px",
+        },
+      },
+    );
+  };
+
   return (
     <div className="group relative bg-white dark:bg-[#09090b] border border-zinc-200 dark:border-zinc-800/80 rounded-2xl overflow-hidden hover:bg-zinc-50/30 dark:hover:bg-zinc-900/10 transition-all duration-300 shadow-sm hover:shadow-md">
       {/* Context Menu Dropdown Anchor */}
-      <div className="absolute top-4 right-4 z-10">
-        <button className="p-1.5 rounded-full text-zinc-400 hover:text-zinc-900 dark:hover:text-zinc-100 hover:bg-zinc-100 dark:hover:bg-zinc-800/80 active:scale-95 transition-all cursor-pointer">
+      <div className="absolute top-4 right-4 z-10" ref={menuRef}>
+        <button
+          onClick={() => setMenuOpen((o) => !o)}
+          className="p-1.5 rounded-full text-zinc-400 hover:text-zinc-900 dark:hover:text-zinc-100 hover:bg-zinc-100 dark:hover:bg-zinc-800/80 active:scale-95 transition-all cursor-pointer"
+        >
           <MoreVertIcon sx={{ fontSize: 16 }} />
         </button>
+
+        {menuOpen && (
+          <div className="absolute right-0 mt-1.5 w-40 bg-white dark:bg-zinc-900 border border-zinc-200 dark:border-zinc-800 rounded-xl shadow-lg overflow-hidden py-1 animate-in fade-in zoom-in-95 duration-150">
+            <button
+              onClick={handleDeleteClick}
+              className="w-full flex items-center gap-2 px-3.5 py-2 text-xs font-medium text-red-500 hover:bg-red-50 dark:hover:bg-red-500/10 transition-colors cursor-pointer"
+            >
+              <DeleteOutlineIcon sx={{ fontSize: 15 }} />
+              Delete Coach
+            </button>
+          </div>
+        )}
       </div>
 
       <div className="p-6">
