@@ -13,11 +13,12 @@ import BadgeIcon from "@mui/icons-material/Badge";
 import CakeIcon from "@mui/icons-material/Cake";
 import PersonIcon from "@mui/icons-material/Person";
 import CalendarMonthIcon from "@mui/icons-material/CalendarMonth";
-import FitnessCenterIcon from "@mui/icons-material/FitnessCenter";
 import MonitorWeightIcon from "@mui/icons-material/MonitorWeight";
 import HeightIcon from "@mui/icons-material/Height";
 import BloodtypeIcon from "@mui/icons-material/Bloodtype";
-import EmergencyIcon from "@mui/icons-material/Emergency";
+import HomeIcon from "@mui/icons-material/Home";
+import MedicalServicesIcon from "@mui/icons-material/MedicalServices";
+import HealingIcon from "@mui/icons-material/Healing";
 import QRCode from "react-qr-code";
 
 function MemberProfile() {
@@ -47,15 +48,13 @@ function MemberProfile() {
   if (!profile) {
     return (
       <div className="min-h-screen bg-zinc-50 dark:bg-[#030303] flex items-center justify-center p-6">
-        <div className="relative -mt-14 flex flex-col sm:flex-row sm:items-end gap-5"></div>
         <div className="text-center max-w-sm">
           <p className="text-zinc-800 dark:text-zinc-200 text-sm font-medium">
             Member profile not found
           </p>
-
           <button
             onClick={() => navigate(-1)}
-            className="mt-4 px-4 py-2 bg-zinc-900 dark:bg-white text-white dark:text-black rounded-full text-xs font-medium"
+            className="mt-4 px-4 py-2 bg-zinc-900 dark:bg-white text-white dark:text-black rounded-full text-xs font-medium transition-transform active:scale-95"
           >
             Go Back
           </button>
@@ -64,101 +63,122 @@ function MemberProfile() {
     );
   }
 
+  // Check payment status (1 = active, anything else = inactive)
+  const isActive = profile.payment_status === 1;
+
   return (
-    <div className="min-h-screen bg-zinc-50 dark:bg-[#030303] text-zinc-600 dark:text-zinc-400 font-sans antialiased transition-colors duration-500">
+    <div className="min-h-screen bg-zinc-50 dark:bg-[#030303] text-zinc-600 dark:text-zinc-400 font-sans antialiased transition-colors duration-300">
       <Sidebar />
       <ThemeToggle />
 
-      <main className="ml-20 px-6 py-10 max-w-6xl mx-auto space-y-6">
-        {/* BACK */}
+      <main className="ml-20 px-4 md:px-8 py-10 max-w-6xl mx-auto space-y-6">
+        {/* BACK BUTTON */}
         <button
           onClick={() => navigate(-1)}
-          className="flex items-center gap-2 text-zinc-400 hover:text-zinc-900 dark:hover:text-zinc-100 transition-colors"
+          className="flex items-center gap-2 text-zinc-400 hover:text-zinc-900 dark:hover:text-zinc-100 transition-colors group"
         >
-          <ArrowBackIcon sx={{ fontSize: 16 }} />
+          <ArrowBackIcon
+            sx={{ fontSize: 16 }}
+            className="group-hover:-translate-x-0.5 transition-transform"
+          />
           <span className="text-xs font-medium">Back to Members</span>
         </button>
 
-        {/* PROFILE CARD */}
+        {/* MAIN PROFILE CARD */}
         <div className="bg-white dark:bg-[#09090b] border border-zinc-200 dark:border-zinc-800 rounded-2xl overflow-hidden shadow-sm">
-          {/* TOP BANNER */}
-          <div className="h-40 bg-zinc-100 dark:bg-zinc-900 border-b border-zinc-200 dark:border-zinc-800" />
-
-          <div className="px-8 pb-10">
-            {/* PROFILE TOP */}
-            <div className="relative -mt-14 flex flex-col lg:flex-row lg:items-end lg:justify-between gap-6">
-              <div className="flex flex-col sm:flex-row sm:items-end gap-5">
+          <div className="p-6 md:p-10">
+            {/* HEADER ALIGNMENT FIX */}
+            <div className="flex flex-col md:flex-row md:items-center md:justify-between gap-6 border-b border-zinc-100 dark:border-zinc-900 pb-8">
+              <div className="flex flex-col sm:flex-row sm:items-center gap-5">
                 {/* Profile Image */}
-                <div className="w-28 h-28 rounded-full overflow-hidden border-4 border-white dark:border-[#09090b] bg-zinc-100 dark:bg-zinc-900 shadow-sm shrink-0 flex items-center justify-center">
-                  {profile.url ? (
+                <div className="w-24 h-24 rounded-full overflow-hidden border-2 border-zinc-200 dark:border-zinc-800 bg-zinc-100 dark:bg-zinc-900 shadow-inner shrink-0 flex items-center justify-center">
+                  {profile.url || profile.img_url ? (
                     <img
-                      src={profile.url}
+                      src={profile.url || profile.img_url}
                       alt={profile.name}
                       className="w-full h-full object-cover"
                     />
                   ) : (
-                    <PersonIcon sx={{ fontSize: 40, color: "#a1a1aa" }} />
+                    <PersonIcon sx={{ fontSize: 36, color: "#a1a1aa" }} />
                   )}
                 </div>
 
-                {/* Name */}
-                <div className="pb-2">
-                  <h1 className="text-2xl font-semibold text-zinc-900 dark:text-white tracking-tight">
-                    {profile.name}
-                  </h1>
-
-                  <div className="flex flex-wrap items-center gap-2 mt-2 text-[10px] uppercase font-mono font-bold tracking-wide text-zinc-400">
-                    <span className="bg-zinc-100 dark:bg-zinc-900 border border-zinc-200 dark:border-zinc-800 px-2 py-0.5 rounded text-zinc-700 dark:text-zinc-300">
-                      ID // {profile.ras_id}
+                {/* Name & Quick Metadata */}
+                <div className="space-y-2">
+                  <div className="flex flex-wrap items-center gap-3">
+                    <h1 className="text-2xl md:text-3xl font-semibold text-zinc-900 dark:text-white tracking-tight">
+                      {profile.name}
+                    </h1>
+                    {/* Payment Status Badge */}
+                    <span
+                      className={`inline-flex items-center gap-1.5 px-2.5 py-0.5 text-[11px] font-medium rounded-full ${
+                        isActive
+                          ? "bg-emerald-50 dark:bg-emerald-950/40 text-emerald-700 dark:text-emerald-400 border border-emerald-200 dark:border-emerald-900/60"
+                          : "bg-rose-50 dark:bg-rose-950/40 text-rose-700 dark:text-rose-400 border border-rose-200 dark:border-rose-900/60"
+                      }`}
+                    >
+                      <span
+                        className={`w-1.5 h-1.5 rounded-full ${isActive ? "bg-emerald-500" : "bg-rose-500"}`}
+                      />
+                      {isActive ? "Active" : "Inactive"}
                     </span>
+                  </div>
 
+                  <div className="flex flex-wrap items-center gap-2 text-[10px] uppercase font-mono font-bold tracking-wide text-zinc-400">
+                    <span className="bg-zinc-100 dark:bg-zinc-900 border border-zinc-200 dark:border-zinc-800 px-2 py-0.5 rounded text-zinc-700 dark:text-zinc-300">
+                      ID : {profile.ras_id || "N/A"}
+                    </span>
                     <span>•</span>
-
-                    <span>{profile.gender || "Unspecified"}</span>
+                    <span className="bg-zinc-50 dark:bg-zinc-900 px-2 py-0.5 rounded text-zinc-500">
+                      {profile.gender || "Unspecified"}
+                    </span>
                   </div>
                 </div>
               </div>
 
-              {/* QR Code */}
-              <div className="flex justify-start lg:justify-end">
-                <div className="bg-white dark:bg-zinc-950 rounded-2xl p-4 border border-zinc-200 dark:border-zinc-800 shadow-sm">
+              {/* Refined Pro QR Code Container */}
+              <div className="self-start md:self-auto bg-zinc-50 dark:bg-zinc-900/50 rounded-xl p-3 border border-zinc-100 dark:border-zinc-850 flex items-center gap-4 max-w-xs shadow-sm">
+                <div className="p-1.5 bg-white rounded-lg inline-block shrink-0">
                   <QRCode
                     value={`${window.location.origin}/members/${profile.id}`}
-                    size={120}
-                    bgColor="transparent"
-                    fgColor="#18181b"
+                    size={64}
+                    bgColor="#ffffff"
+                    fgColor="#09090b"
                   />
-
-                  <p className="text-center mt-3 text-[10px] uppercase tracking-wider text-zinc-400 font-medium">
-                    Scan Member
+                </div>
+                <div>
+                  <p className="text-[10px] font-mono font-bold uppercase tracking-wider text-zinc-400">
+                    Member QR Pass
+                  </p>
+                  <p className="text-[11px] text-zinc-500 dark:text-zinc-400 mt-0.5 leading-tight">
+                    Scan for check-in or access validation
                   </p>
                 </div>
               </div>
             </div>
 
-            {/* CONTENT GRID */}
-            <div className="grid grid-cols-1 md:grid-cols-2 xl:grid-cols-4 gap-8 mt-12 pt-8 border-t border-zinc-100 dark:border-zinc-900">
-              {/* PERSONAL */}
-              <div className="space-y-5">
-                <h3 className="section-title">// Personal Records</h3>
-
-                <div className="space-y-4">
+            {/* CONTENT SECTIONS GRID */}
+            <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-8 mt-8">
+              {/* PERSONAL RECORDS */}
+              <div className="space-y-4">
+                <h3 className="text-xs font-bold uppercase tracking-wider text-zinc-400 dark:text-zinc-500 font-mono">
+                  Personal Records
+                </h3>
+                <div className="space-y-3.5">
                   <ProfileInfoItem
-                    icon={<PhoneIcon sx={{ fontSize: 14 }} />}
+                    icon={<PhoneIcon sx={{ fontSize: 13 }} />}
                     label="Phone Number"
                     value={profile.phone}
                     isMono
                   />
-
                   <ProfileInfoItem
-                    icon={<BadgeIcon sx={{ fontSize: 14 }} />}
+                    icon={<BadgeIcon sx={{ fontSize: 13 }} />}
                     label="Member ID"
                     value={profile.ras_id}
                     isMono
                   />
-
                   <ProfileInfoItem
-                    icon={<CakeIcon sx={{ fontSize: 14 }} />}
+                    icon={<CakeIcon sx={{ fontSize: 13 }} />}
                     label="Date of Birth"
                     value={
                       profile.b_date
@@ -166,80 +186,102 @@ function MemberProfile() {
                         : null
                     }
                   />
+                  <ProfileInfoItem
+                    icon={<HomeIcon sx={{ fontSize: 13 }} />}
+                    label="Address"
+                    value={
+                      profile.sub_city || profile.woreda
+                        ? `${profile.sub_city || "-"}, Woreda ${profile.woreda || "-"}`
+                        : null
+                    }
+                  />
                 </div>
               </div>
 
-              {/* HEALTH */}
-              <div className="space-y-5">
-                <h3 className="section-title">// Health Metrics</h3>
-
-                <div className="space-y-4">
+              {/* HEALTH & MEDICAL METRICS */}
+              <div className="space-y-4">
+                <h3 className="text-xs font-bold uppercase tracking-wider text-zinc-400 dark:text-zinc-500 font-mono">
+                  Health Metrics
+                </h3>
+                <div className="space-y-3.5">
                   <ProfileInfoItem
-                    icon={<MonitorWeightIcon sx={{ fontSize: 14 }} />}
+                    icon={<MonitorWeightIcon sx={{ fontSize: 13 }} />}
                     label="Weight"
-                    value={profile.health?.weight}
+                    value={
+                      profile.health?.weight
+                        ? `${profile.health.weight} kg`
+                        : null
+                    }
                   />
-
                   <ProfileInfoItem
-                    icon={<HeightIcon sx={{ fontSize: 14 }} />}
+                    icon={<HeightIcon sx={{ fontSize: 13 }} />}
                     label="Height"
-                    value={profile.health?.height}
+                    value={
+                      profile.health?.height
+                        ? `${profile.health.height} cm`
+                        : null
+                    }
                   />
-
                   <ProfileInfoItem
-                    icon={<BloodtypeIcon sx={{ fontSize: 14 }} />}
+                    icon={<BloodtypeIcon sx={{ fontSize: 13 }} />}
                     label="Blood Type"
                     value={profile.health?.bloodType}
                   />
+                  <ProfileInfoItem
+                    icon={<HealingIcon sx={{ fontSize: 13 }} />}
+                    label="Reported Injury"
+                    value={profile.health?.injury}
+                  />
+                  <ProfileInfoItem
+                    icon={<MedicalServicesIcon sx={{ fontSize: 13 }} />}
+                    label="Medical Issue"
+                    value={profile.health?.issue}
+                  />
                 </div>
               </div>
 
-              {/* TRAINING */}
-              <div className="space-y-5">
-                <h3 className="section-title flex items-center gap-1.5">
-                  <FitnessCenterIcon sx={{ fontSize: 12 }} />
-                  // Training Types
+              {/* TRAINING TYPES */}
+              <div className="space-y-4">
+                <h3 className="text-xs font-bold uppercase tracking-wider text-zinc-400 dark:text-zinc-500 font-mono">
+                  Training Scope
                 </h3>
-
-                <div className="flex flex-wrap gap-2">
+                <div className="flex flex-wrap gap-1.5">
                   {profile.trainingTypes?.length > 0 ? (
                     profile.trainingTypes.map((t) => (
                       <span
                         key={t.id}
-                        className="px-3 py-1.5 bg-zinc-50 dark:bg-zinc-900 border border-zinc-200 dark:border-zinc-800 rounded-xl text-zinc-800 dark:text-zinc-200 text-xs font-medium"
+                        className="px-2.5 py-1 bg-zinc-50 dark:bg-zinc-900 border border-zinc-200 dark:border-zinc-800 rounded-lg text-zinc-800 dark:text-zinc-200 text-xs font-medium"
                       >
                         {t.t_type || t.name}
                       </span>
                     ))
                   ) : (
-                    <p className="empty-text">No training assigned</p>
+                    <p className="text-xs italic text-zinc-400">
+                      No types assigned
+                    </p>
                   )}
                 </div>
               </div>
 
-              {/* EMERGENCY */}
-              <div className="space-y-5">
-                <h3 className="section-title flex items-center gap-1.5">
-                  <EmergencyIcon sx={{ fontSize: 12 }} />
-                  // Emergency Contact
+              {/* EMERGENCY CONTACT */}
+              <div className="space-y-4">
+                <h3 className="text-xs font-bold uppercase tracking-wider text-zinc-400 dark:text-zinc-500 font-mono">
+                  Emergency Contact
                 </h3>
-
-                <div className="space-y-4">
+                <div className="space-y-3.5">
                   <ProfileInfoItem
-                    icon={<PersonIcon sx={{ fontSize: 14 }} />}
-                    label="Full Name"
-                    value={profile.emergency?.fullName}
+                    icon={<PersonIcon sx={{ fontSize: 13 }} />}
+                    label="Contact Name"
+                    value={profile.emergency?.contact_name}
                   />
-
                   <ProfileInfoItem
-                    icon={<PhoneIcon sx={{ fontSize: 14 }} />}
+                    icon={<PhoneIcon sx={{ fontSize: 13 }} />}
                     label="Phone"
                     value={profile.emergency?.phone}
                     isMono
                   />
-
                   <ProfileInfoItem
-                    icon={<BadgeIcon sx={{ fontSize: 14 }} />}
+                    icon={<BadgeIcon sx={{ fontSize: 13 }} />}
                     label="Relationship"
                     value={profile.emergency?.relationship}
                   />
@@ -247,67 +289,79 @@ function MemberProfile() {
               </div>
             </div>
 
-            {/* SCHEDULES */}
-            <div className="mt-12 pt-8 border-t border-zinc-100 dark:border-zinc-900">
-              <h3 className="section-title flex items-center gap-1.5 mb-5">
-                <CalendarMonthIcon sx={{ fontSize: 12 }} />
-                // Training Schedules
-              </h3>
-
-              <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
+            {/* SCHEDULES LAYOUT */}
+            <div className="mt-10 pt-8 border-t border-zinc-100 dark:border-zinc-900">
+              <div className="flex items-center gap-2 mb-4">
+                <CalendarMonthIcon
+                  sx={{ fontSize: 14 }}
+                  className="text-zinc-400"
+                />
+                <h3 className="text-xs font-bold uppercase tracking-wider text-zinc-400 dark:text-zinc-500 font-mono">
+                  Training Schedules
+                </h3>
+              </div>
+              <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-3">
                 {profile.schedules?.length > 0 ? (
                   profile.schedules.map((s) => (
                     <div
                       key={s.id}
-                      className="flex justify-between items-center px-4 py-3 bg-zinc-50 dark:bg-zinc-900 border border-zinc-200 dark:border-zinc-800 rounded-xl"
+                      className="flex justify-between items-center px-4 py-2.5 bg-zinc-50 dark:bg-zinc-900/40 border border-zinc-200 dark:border-zinc-800 rounded-xl"
                     >
                       <span className="text-zinc-800 dark:text-zinc-200 text-xs font-medium uppercase font-mono">
                         {s.date || s.day}
                       </span>
-
-                      <span className="text-[10px] font-mono font-bold border border-zinc-200 dark:border-zinc-700 bg-white dark:bg-zinc-950 px-2 py-1 rounded">
+                      <span className="text-[10px] font-mono font-bold border border-zinc-200 dark:border-zinc-700 bg-white dark:bg-zinc-950 px-2 py-0.5 rounded shadow-sm text-zinc-700 dark:text-zinc-300">
                         {s.time || `${s.startTime} - ${s.endTime}`}
                       </span>
                     </div>
                   ))
                 ) : (
-                  <p className="empty-text">No schedules assigned</p>
+                  <p className="text-xs italic text-zinc-400 col-span-full">
+                    No schedules assigned
+                  </p>
                 )}
               </div>
             </div>
 
-            {/* COACHES */}
-            <div className="mt-12 pt-8 border-t border-zinc-100 dark:border-zinc-900">
-              <h3 className="section-title mb-5">// Assigned Coaches</h3>
-
-              <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-5">
+            {/* COACHES LAYOUT */}
+            <div className="mt-10 pt-8 border-t border-zinc-100 dark:border-zinc-900">
+              <h3 className="text-xs font-bold uppercase tracking-wider text-zinc-400 dark:text-zinc-500 font-mono mb-4">
+                Assigned Coaches
+              </h3>
+              <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4">
                 {profile.coaches?.length > 0 ? (
                   profile.coaches.map((coach) => (
                     <div
                       key={coach.id}
-                      className="bg-zinc-50 dark:bg-zinc-900 border border-zinc-200 dark:border-zinc-800 rounded-2xl p-5 flex items-center gap-4"
+                      className="bg-zinc-50 dark:bg-zinc-900/40 border border-zinc-200 dark:border-zinc-800 rounded-xl p-4 flex items-center gap-3.5"
                     >
-                      <div className="w-16 h-16 rounded-full overflow-hidden bg-zinc-200 dark:bg-zinc-800 shrink-0">
-                        <img
-                          src={coach.url}
-                          alt={coach.name}
-                          className="w-full h-full object-cover"
-                        />
+                      <div className="w-12 h-12 rounded-full overflow-hidden bg-zinc-200 dark:bg-zinc-800 shrink-0 border border-zinc-200 dark:border-zinc-700">
+                        {coach.url ? (
+                          <img
+                            src={coach.url}
+                            alt={coach.name}
+                            className="w-full h-full object-cover"
+                          />
+                        ) : (
+                          <div className="w-full h-full flex items-center justify-center text-zinc-400">
+                            <PersonIcon sx={{ fontSize: 20 }} />
+                          </div>
+                        )}
                       </div>
-
-                      <div>
-                        <h4 className="text-sm font-semibold text-zinc-900 dark:text-white">
+                      <div className="min-w-0">
+                        <h4 className="text-xs font-semibold text-zinc-900 dark:text-white truncate">
                           {coach.name}
                         </h4>
-
-                        <p className="text-xs text-zinc-500 mt-1">
-                          {coach.phone}
+                        <p className="text-[11px] text-zinc-400 font-mono mt-0.5 truncate">
+                          {coach.phone || "No phone added"}
                         </p>
                       </div>
                     </div>
                   ))
                 ) : (
-                  <p className="empty-text">No coaches assigned</p>
+                  <p className="text-xs italic text-zinc-400 col-span-full">
+                    No coaches assigned
+                  </p>
                 )}
               </div>
             </div>
@@ -318,40 +372,37 @@ function MemberProfile() {
   );
 }
 
-/* HELPER */
+/* HELPER COMPONENTS */
 
 function ProfileInfoItem({ icon, label, value, isMono = false }) {
   return (
-    <div className="flex items-start gap-3.5">
-      <div className="p-2 bg-zinc-50 dark:bg-zinc-900 border border-zinc-200 dark:border-zinc-800 rounded-xl text-zinc-400 dark:text-zinc-500 shrink-0 mt-0.5">
+    <div className="flex items-start gap-3">
+      <div className="p-1.5 bg-zinc-50 dark:bg-zinc-900/80 border border-zinc-200 dark:border-zinc-800 rounded-lg text-zinc-400 dark:text-zinc-500 shrink-0 mt-0.5 flex items-center justify-center">
         {icon}
       </div>
 
       <div className="min-w-0 space-y-0.5">
-        <p className="text-[10px] font-medium uppercase text-zinc-400 tracking-tight">
+        <p className="text-[9px] font-bold uppercase text-zinc-400 dark:text-zinc-500 tracking-wider font-mono">
           {label}
         </p>
-
         <p
-          className={`text-sm tracking-tight truncate ${
+          className={`text-xs tracking-tight truncate ${
             value
               ? "text-zinc-900 dark:text-zinc-200 font-medium"
-              : "text-zinc-400 italic"
-          } ${isMono ? "font-mono text-xs" : ""}`}
+              : "text-zinc-400 dark:text-zinc-600 italic"
+          } ${isMono ? "font-mono" : ""}`}
         >
-          {value || "Not assigned"}
+          {value || "None"}
         </p>
       </div>
     </div>
   );
 }
 
-/* SKELETON */
-
 function ProfileSkeleton() {
   return (
     <div className="min-h-screen bg-zinc-50 dark:bg-[#030303] animate-pulse p-12 flex justify-center items-center">
-      <div className="w-full max-w-6xl h-[500px] bg-white dark:bg-zinc-900/20 rounded-2xl border border-zinc-200 dark:border-zinc-800" />
+      <div className="w-full max-w-6xl h-150 bg-white dark:bg-zinc-900/20 rounded-2xl border border-zinc-200 dark:border-zinc-800" />
     </div>
   );
 }
