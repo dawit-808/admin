@@ -173,7 +173,7 @@ function MembersTable({
                     <td className="px-6 py-4.5">
                       <div className="flex items-center gap-3">
                         <div className="w-8 h-8 rounded-full bg-zinc-200 dark:bg-zinc-800 shrink-0"></div>
-                        <div className="space-y-2 w-full max-w-[140px]">
+                        <div className="space-y-2 w-full max-w-35">
                           <div className="h-3 bg-zinc-200 dark:bg-zinc-800 rounded"></div>
                           <div className="h-2.5 bg-zinc-100 dark:bg-zinc-900 rounded w-2/3"></div>
                         </div>

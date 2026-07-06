@@ -63,7 +63,7 @@ function Members() {
       <ThemeToggle />
 
       <main className="ml-20 min-h-screen">
-        <div className="max-w-[1400px] mx-auto px-8 py-12 space-y-12">
+        <div className="max-w-350 mx-auto px-8 py-12 space-y-12">
           <header className="flex justify-between items-center border-b border-zinc-100 dark:border-zinc-900 pb-4">
             <h1 className="text-2xl font-semibold text-zinc-900 dark:text-white">
               Members Management

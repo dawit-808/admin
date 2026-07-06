@@ -225,7 +225,7 @@ function ProfileInfoItem({ icon, label, value, isMono = false }) {
 function ProfileSkeleton() {
   return (
     <div className="min-h-screen bg-zinc-50 dark:bg-[#030303] animate-pulse p-12 flex justify-center items-center">
-      <div className="w-full max-w-5xl h-[450px] bg-white dark:bg-zinc-900/20 rounded-2xl border border-zinc-200 dark:border-zinc-800" />
+      <div className="w-full max-w-5xl h-150 bg-white dark:bg-zinc-900/20 rounded-2xl border border-zinc-200 dark:border-zinc-800" />
     </div>
   );
 }
