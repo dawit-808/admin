@@ -1,7 +1,15 @@
 import { useState } from "react";
 import { ResponsiveContainer, PieChart, Pie, Cell, Tooltip } from "recharts";
 
-const COLORS = ["#6366f1", "#ec4899", "#10b981"];
+const GENDER_COLORS = {
+  male: "#52525b",
+  female: "#10b981",
+  other: "#a1a1aa",
+};
+
+function colorFor(gender) {
+  return GENDER_COLORS[gender?.toLowerCase()] || GENDER_COLORS.other;
+}
 
 function CustomTooltip({ active, payload, total }) {
   if (!active || !payload?.length) return null;
@@ -9,17 +17,15 @@ function CustomTooltip({ active, payload, total }) {
   const percent = total > 0 ? Math.round((item.value / total) * 100) : 0;
 
   return (
-    <div className="rounded-lg border border-zinc-200 bg-white px-3 py-2 text-sm shadow-lg dark:border-zinc-700 dark:bg-zinc-800">
+    <div className="bg-[#09090b] px-3 py-2 text-sm border border-zinc-800">
       <div className="flex items-center gap-2">
         <span
           className="h-2 w-2 rounded-full"
           style={{ backgroundColor: item.payload.fill }}
         />
-        <span className="font-medium text-zinc-800 dark:text-zinc-100">
-          {item.name}
-        </span>
+        <span className="font-medium text-white">{item.name}</span>
       </div>
-      <div className="mt-0.5 text-zinc-500">
+      <div className="mt-0.5 text-zinc-400">
         {item.value} members · {percent}%
       </div>
     </div>
@@ -31,54 +37,47 @@ function GenderChart({ data }) {
 
   if (!data || data.length === 0) {
     return (
-      <section className="rounded-2xl border border-zinc-200 dark:border-zinc-800 bg-white dark:bg-zinc-900 shadow-sm">
-        <div className="px-5 py-4">
-          <h2 className="text-sm font-semibold text-zinc-900 dark:text-white">
-            Gender Distribution
-          </h2>
-        </div>
-        <div className="flex h-52 items-center justify-center text-sm text-zinc-400">
+      <div className="bg-white dark:bg-[#09090b] border border-zinc-200 dark:border-zinc-800 rounded-md p-4">
+        <span className="text-[10px] uppercase tracking-wide text-zinc-400">
+          Gender Distribution
+        </span>
+        <div className="flex h-32 items-center justify-center text-sm text-zinc-500">
           No data available.
         </div>
-      </section>
+      </div>
     );
   }
 
   const total = data.reduce((sum, d) => sum + d.total, 0);
-  const colored = data.map((d, i) => ({
-    ...d,
-    fill: COLORS[i % COLORS.length],
-  }));
+  const colored = data.map((d) => ({ ...d, fill: colorFor(d.gender) }));
 
   return (
-    <section className="rounded-2xl border border-zinc-200 dark:border-zinc-800 bg-white dark:bg-zinc-900 shadow-sm">
-      <div className="px-5 py-4">
-        <h2 className="text-sm font-semibold text-zinc-900 dark:text-white">
-          Gender Distribution
-        </h2>
-      </div>
+    <div className="bg-white dark:bg-[#09090b] border border-zinc-200 dark:border-zinc-800 rounded-md p-4">
+      <span className="text-[10px] uppercase tracking-wide text-zinc-400">
+        Gender Distribution
+      </span>
 
-      <div className="flex items-center gap-4 px-5 pb-5">
-        <div className="relative h-44 w-44 shrink-0">
+      <div className="mt-4 flex items-center gap-4">
+        <div className="relative h-28 w-28 shrink-0">
           <ResponsiveContainer width="100%" height="100%">
             <PieChart>
               <Pie
                 data={colored}
                 dataKey="total"
                 nameKey="gender"
-                innerRadius={54}
-                outerRadius={72}
-                paddingAngle={4}
+                innerRadius={38}
+                outerRadius={52}
+                paddingAngle={3}
                 stroke="none"
                 onMouseEnter={(_, i) => setActiveIndex(i)}
                 onMouseLeave={() => setActiveIndex(null)}
               >
-                {colored.map((entry, index) => (
+                {colored.map((entry, i) => (
                   <Cell
-                    key={index}
+                    key={i}
                     fill={entry.fill}
                     opacity={
-                      activeIndex === null || activeIndex === index ? 1 : 0.35
+                      activeIndex === null || activeIndex === i ? 1 : 0.35
                     }
                     style={{ transition: "opacity 150ms ease" }}
                   />
@@ -87,12 +86,11 @@ function GenderChart({ data }) {
               <Tooltip content={<CustomTooltip total={total} />} />
             </PieChart>
           </ResponsiveContainer>
-
           <div className="pointer-events-none absolute inset-0 flex flex-col items-center justify-center">
-            <span className="text-2xl font-bold text-zinc-900 dark:text-white">
+            <span className="text-xl font-bold text-zinc-900 dark:text-white">
               {total}
             </span>
-            <span className="text-xs text-zinc-400">members</span>
+            <span className="text-[9px] uppercase text-zinc-400">members</span>
           </div>
         </div>
 
@@ -103,16 +101,16 @@ function GenderChart({ data }) {
             return (
               <div
                 key={entry.gender}
-                className="flex cursor-default items-center justify-between gap-2 rounded-md px-1.5 py-1 transition-colors hover:bg-zinc-50 dark:hover:bg-zinc-800/50"
+                className="flex items-center justify-between"
                 onMouseEnter={() => setActiveIndex(i)}
                 onMouseLeave={() => setActiveIndex(null)}
               >
                 <div className="flex items-center gap-2">
                   <span
-                    className="h-2.5 w-2.5 rounded-full"
+                    className="h-2 w-2 rounded-full"
                     style={{ backgroundColor: entry.fill }}
                   />
-                  <span className="text-sm text-zinc-600 dark:text-zinc-300">
+                  <span className="text-xs uppercase text-zinc-400">
                     {entry.gender}
                   </span>
                 </div>
@@ -124,7 +122,7 @@ function GenderChart({ data }) {
           })}
         </div>
       </div>
-    </section>
+    </div>
   );
 }
 
