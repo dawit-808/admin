@@ -37,7 +37,10 @@ function PaymentVerification() {
     const cleanRef = reference.trim();
     const cleanPhone = phoneNumber.trim();
 
-    if (!cleanRasId || !cleanRef || !cleanPhone) {
+    // Dynamically adjust validation based on selected provider
+    const isPhoneRequired = provider === "telebirr";
+
+    if (!cleanRasId || !cleanRef || (isPhoneRequired && !cleanPhone)) {
       setError("All fields are required to verify your transaction.");
       return;
     }
@@ -48,10 +51,10 @@ function PaymentVerification() {
 
     try {
       const payload = {
-        provider, // Sent directly to your backend route
+        provider,
         memberRasId: cleanRasId,
         reference: cleanRef,
-        phoneNumber: cleanPhone,
+        phoneNumber: isPhoneRequired ? cleanPhone : "", // Clear phone for CBE
       };
 
       const res = await api.post("/payments/verify", payload);
@@ -163,25 +166,27 @@ function PaymentVerification() {
             </div>
           </div>
 
-          {/* PHONE NUMBER */}
-          <div>
-            <label className="block text-[11px] font-semibold text-zinc-500 dark:text-zinc-400 mb-1.5 uppercase tracking-wider">
-              Phone Number
-            </label>
-            <div className="relative group">
-              <PhoneIcon
-                className="absolute left-3 top-2.5 text-zinc-400 group-focus-within:text-zinc-600 dark:group-focus-within:text-zinc-300 transition-colors"
-                sx={{ fontSize: 16 }}
-              />
-              <input
-                type="tel"
-                value={phoneNumber}
-                onChange={(e) => setPhoneNumber(e.target.value)}
-                placeholder="e.g., 251922090582"
-                className="w-full pl-9 pr-4 py-2 text-xs rounded-xl border border-zinc-200 dark:border-zinc-800 bg-zinc-50/50 dark:bg-zinc-900/20 text-zinc-900 dark:text-white placeholder-zinc-400 focus:outline-none focus:ring-2 focus:ring-zinc-900/5 dark:focus:ring-white/5 focus:border-zinc-400 dark:focus:border-zinc-700 transition-all"
-              />
+          {/* PHONE NUMBER (Rendered only if Telebirr is chosen) */}
+          {provider === "telebirr" && (
+            <div className="transition-all duration-300 animate-fadeIn">
+              <label className="block text-[11px] font-semibold text-zinc-500 dark:text-zinc-400 mb-1.5 uppercase tracking-wider">
+                Phone Number
+              </label>
+              <div className="relative group">
+                <PhoneIcon
+                  className="absolute left-3 top-2.5 text-zinc-400 group-focus-within:text-zinc-600 dark:group-focus-within:text-zinc-300 transition-colors"
+                  sx={{ fontSize: 16 }}
+                />
+                <input
+                  type="tel"
+                  value={phoneNumber}
+                  onChange={(e) => setPhoneNumber(e.target.value)}
+                  placeholder="e.g., 251922090582"
+                  className="w-full pl-9 pr-4 py-2 text-xs rounded-xl border border-zinc-200 dark:border-zinc-800 bg-zinc-50/50 dark:bg-zinc-900/20 text-zinc-900 dark:text-white placeholder-zinc-400 focus:outline-none focus:ring-2 focus:ring-zinc-900/5 dark:focus:ring-white/5 focus:border-zinc-400 dark:focus:border-zinc-700 transition-all"
+                />
+              </div>
             </div>
-          </div>
+          )}
 
           {/* TRANSACTION REFERENCE */}
           <div>
