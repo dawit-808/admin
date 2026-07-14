@@ -21,6 +21,7 @@ import AddMemberPage from "./pages/AddMemberPage";
 import AddCoachPage from "./pages/AddCoachPage";
 import MemberProfile from "./pages/MemberProfile";
 import VerifyPayment from "./pages/VerifyPayment";
+import ScheduleAndtt from "./pages/ScheduleAndtt";
 
 function AppRoutes() {
   const { loading, authReady } = useContext(AuthContext);
@@ -38,6 +39,7 @@ function AppRoutes() {
         <Route path="/" element={<Statistics />} />
         <Route path="/members" element={<Members />} />
         <Route path="/coaches" element={<Coaches />} />
+        <Route path="/schedule-trainings" element={<ScheduleAndtt />} />
         <Route path="/add-member" element={<AddMemberPage />} />
         <Route path="/add-coach" element={<AddCoachPage />} />
         <Route path="/verify-payment" element={<VerifyPayment />} />

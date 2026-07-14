@@ -2,7 +2,7 @@ import { useState, useEffect } from "react";
 import api from "../api/api";
 import SearchIcon from "@mui/icons-material/Search";
 import BadgeIcon from "@mui/icons-material/Badge";
-import PhoneIcon from "@mui/icons-material/Phone";
+import AccountBalanceIcon from "@mui/icons-material/AccountBalance";
 import CheckCircleIcon from "@mui/icons-material/CheckCircle";
 import CancelIcon from "@mui/icons-material/Cancel";
 import Sidebar from "../components/Sidebar";
@@ -17,32 +17,58 @@ function PaymentVerification() {
   const [provider, setProvider] = useState("cbe"); // 'cbe' or 'telebirr'
   const [memberRasId, setMemberRasId] = useState("");
   const [reference, setReference] = useState("");
-  const [phoneNumber, setPhoneNumber] = useState("");
+  const [fullAccount, setFullAccount] = useState("");
 
   // Status States
   const [loading, setLoading] = useState(false);
   const [result, setResult] = useState(null);
   const [error, setError] = useState("");
 
-  // Auto-clear states when user modifies any input field
+  // Auto-slice utility to cleanly get the last 8 digits
+  const getSuffixFromAccount = (accountStr) => {
+    const cleaned = accountStr.replace(/\s+/g, "").replace(/-/g, ""); // Remove spaces or dashes
+    if (cleaned.length < 8) return cleaned;
+    return cleaned.slice(-8); // Slice last 8 characters
+  };
+
+  // Reset full account if switching away from cbe
+  useEffect(() => {
+    if (provider !== "cbe") {
+      setFullAccount("");
+    }
+  }, [provider]);
+
+  // Auto-clear feedback blocks when user modifies any input field
   useEffect(() => {
     if (result || error) {
       setResult(null);
       setError("");
     }
-  }, [provider, memberRasId, reference, phoneNumber]);
+  }, [provider, memberRasId, reference, fullAccount]);
 
   const verifyPayment = async () => {
     const cleanRasId = memberRasId.trim();
     const cleanRef = reference.trim();
-    const cleanPhone = phoneNumber.trim();
+    const finalSuffix = getSuffixFromAccount(fullAccount);
 
-    // Dynamically adjust validation based on selected provider
-    const isPhoneRequired = provider === "telebirr";
-
-    if (!cleanRasId || !cleanRef || (isPhoneRequired && !cleanPhone)) {
-      setError("All fields are required to verify your transaction.");
+    // Base validation
+    if (!cleanRasId || !cleanRef) {
+      setError("Please fill out all identification fields.");
       return;
+    }
+
+    // Validation for CBE account details
+    if (provider === "cbe") {
+      if (!fullAccount.trim()) {
+        setError("Account number is required for CBE verification.");
+        return;
+      }
+      if (finalSuffix.length < 8) {
+        setError(
+          "Please enter a valid CBE account number (requires at least 8 digits).",
+        );
+        return;
+      }
     }
 
     setLoading(true);
@@ -54,7 +80,7 @@ function PaymentVerification() {
         provider,
         memberRasId: cleanRasId,
         reference: cleanRef,
-        phoneNumber: isPhoneRequired ? cleanPhone : "", // Clear phone for CBE
+        ...(provider === "cbe" && { suffix: finalSuffix }),
       };
 
       const res = await api.post("/payments/verify", payload);
@@ -166,28 +192,6 @@ function PaymentVerification() {
             </div>
           </div>
 
-          {/* PHONE NUMBER (Rendered only if Telebirr is chosen) */}
-          {provider === "telebirr" && (
-            <div className="transition-all duration-300 animate-fadeIn">
-              <label className="block text-[11px] font-semibold text-zinc-500 dark:text-zinc-400 mb-1.5 uppercase tracking-wider">
-                Phone Number
-              </label>
-              <div className="relative group">
-                <PhoneIcon
-                  className="absolute left-3 top-2.5 text-zinc-400 group-focus-within:text-zinc-600 dark:group-focus-within:text-zinc-300 transition-colors"
-                  sx={{ fontSize: 16 }}
-                />
-                <input
-                  type="tel"
-                  value={phoneNumber}
-                  onChange={(e) => setPhoneNumber(e.target.value)}
-                  placeholder="e.g., 251922090582"
-                  className="w-full pl-9 pr-4 py-2 text-xs rounded-xl border border-zinc-200 dark:border-zinc-800 bg-zinc-50/50 dark:bg-zinc-900/20 text-zinc-900 dark:text-white placeholder-zinc-400 focus:outline-none focus:ring-2 focus:ring-zinc-900/5 dark:focus:ring-white/5 focus:border-zinc-400 dark:focus:border-zinc-700 transition-all"
-                />
-              </div>
-            </div>
-          )}
-
           {/* TRANSACTION REFERENCE */}
           <div>
             <label className="block text-[11px] font-semibold text-zinc-500 dark:text-zinc-400 mb-1.5 uppercase tracking-wider">
@@ -207,6 +211,30 @@ function PaymentVerification() {
               />
             </div>
           </div>
+
+          {/* DYNAMIC FULL CBE ACCOUNT INPUT (Slices suffix automatically) */}
+          {provider === "cbe" && (
+            <div className="animate-fadeIn">
+              <div className="flex justify-between items-center mb-1.5">
+                <label className="block text-[11px] font-semibold text-zinc-500 dark:text-zinc-400 uppercase tracking-wider">
+                  Reciever Account Number
+                </label>
+              </div>
+              <div className="relative group">
+                <AccountBalanceIcon
+                  className="absolute left-3 top-2.5 text-zinc-400 group-focus-within:text-zinc-600 dark:group-focus-within:text-zinc-300 transition-colors"
+                  sx={{ fontSize: 16 }}
+                />
+                <input
+                  type="text"
+                  value={fullAccount}
+                  onChange={(e) => setFullAccount(e.target.value)}
+                  placeholder="e.g., 1000123456789"
+                  className="w-full pl-9 pr-4 py-2 text-xs rounded-xl border border-zinc-200 dark:border-zinc-800 bg-zinc-50/50 dark:bg-zinc-900/20 text-zinc-900 dark:text-white placeholder-zinc-400 focus:outline-none focus:ring-2 focus:ring-zinc-900/5 dark:focus:ring-white/5 focus:border-zinc-400 dark:focus:border-zinc-700 transition-all"
+                />
+              </div>
+            </div>
+          )}
         </div>
 
         {/* ACTION BUTTON */}

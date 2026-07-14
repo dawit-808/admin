@@ -50,10 +50,10 @@ const Sidebar = () => {
           isActive={location.pathname === "/coaches"}
         />
         <NavItem
-          path="/schedules"
+          path="/schedule-trainings"
           icon={EventNote}
-          label="Schedule"
-          isActive={location.pathname === "/schedules"}
+          label="Schedule + Trainings"
+          isActive={location.pathname === "/schedule-trainings"}
         />
 
         <ActionItem
