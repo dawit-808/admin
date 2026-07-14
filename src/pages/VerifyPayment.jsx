@@ -109,11 +109,8 @@ function PaymentVerification() {
         {/* HEADER */}
         <div className="text-center mb-6">
           <h1 className="text-xl font-bold text-zinc-900 dark:text-white tracking-tight">
-            Payment Gateway Verification
+            Payment Verification
           </h1>
-          <p className="text-xs text-zinc-400 mt-1">
-            Verify automated system clearances smoothly.
-          </p>
         </div>
 
         {/* PROVIDER SELECTION */}
