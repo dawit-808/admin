@@ -1,74 +1,42 @@
 # Gym Admin Dashboard
 
-A responsive admin dashboard for managing gym members and subscriptions, built with React and a clean MUI + Tailwind interface. Designed as the frontend client for a separate gym-management backend API.
+Frontend for a gym management system — lets staff register members and coaches, track subscriptions, verify payments, and see stats for the gym at a glance.
 
-## Features
+Built with React + Vite. Talks to a separate backend over REST (not included in this repo).
 
-- **Member Management** — add, view, update, and track gym members
-- **Subscription Tracking** — manage membership plans and renewal status
-- **Profile Photo Capture** — capture or upload member ID/profile photos directly from the browser using the device webcam
-- **Multi-page Navigation** — client-side routing across dashboard sections
-- **REST API Integration** — communicates with a separate backend service via Axios
-- **Modern UI** — built with Material UI components styled on top of Tailwind CSS
+## What it does
 
-## Tech Stack
+- Register and manage members and coaches, including profile photos (webcam capture or upload)
+- Track subscriptions and renewal status
+- Verify CBE / Telebirr payments against a member's account
+- Dashboard with stats: revenue, gender split, coach workload, training activity
+- Role-based routes (admin vs coach access)
+- Dark mode
 
- Category | Technology
-Framework - React 19 + Vite 7 
-Styling - Tailwind CSS v4, Material UI (MUI) v7 
-Routing - React Router v7
-HTTP Client - Axios
-Camera/Photo Capture - react-webcam 
-Icons - Lucide React, React Icons 
-Linting - ESLint 
+## Stack
 
-## Architecture
+React 19, Vite, Tailwind CSS, MUI, React Router, Axios, Recharts.
 
-This repository contains **only the frontend**. It is designed to be paired with a separate backend API (gym member/subscription data, auth, etc.) that this app communicates with over REST using Axios.
+## Getting started
 
-## Getting Started
+You'll need Node 18+ and the [backend](#) running somewhere.
 
-### Prerequisites
-- Node.js 18+
-- A running instance of the [backend API](#) *(link your backend repo here)*
-
-### Installation
-
-```bash
+\`\`\`bash
 git clone https://github.com/dawit-808/admin.git
 cd admin
 npm install
-```
-
-### Configure the API
-
-Update the Axios base URL / environment variable to point to your backend API instance (e.g. via a `.env` file or the relevant config/service file in `src/`).
-
-### Run locally
-
-```bash
 npm run dev
-```
+\`\`\`
 
-### Build for production
+By default the app points at \`http://localhost:5000/api\` — change \`BASE_URL\` in \`src/api/api.js\` if your backend runs elsewhere. (This should probably be an env variable — on the todo list.)
 
-```bash
-npm run build
-npm run preview
-```
+## Scripts
 
-## Available Scripts
+- \`npm run dev\` — dev server
+- \`npm run build\` — production build
+- \`npm run preview\` — preview the build
+- \`npm run lint\` — eslint
 
- Script | Description 
-`npm run dev` Start the Vite dev server with HMR
-`npm run build` Build for production
-`npm run preview` Preview the production build locally
-`npm run lint` Run ESLint
+## Status
 
-## Project Status
-
-Frontend client — pairs with a separate backend service (not included in this repo).
-
-## License
-
-This project currently has no license specified.
+Frontend only, actively being built out alongside the backend. No license yet.
