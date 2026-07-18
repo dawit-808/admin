@@ -13,7 +13,15 @@ Pairs with the [backend](https://github.com/yonatanfeseha/ras-new-backend) — t
 - Verify CBE / Telebirr payments against a member's account
 - Dashboard with stats: revenue, gender split, coach workload, training activity
 - Role-based routes (admin vs coach access)
-- Dark mode
+
+## Highlights
+
+- QR-code membership verification
+- Automatic membership expiry using scheduled jobs
+- JWT authentication with rotating refresh tokens
+- Payment verification for CBE & Telebirr
+- Dashboard analytics
+- Role-based authorization
 
 ## Stack
 
