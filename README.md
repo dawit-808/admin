@@ -41,4 +41,4 @@ npm run dev
 
 ## Status
 
-Frontend only, actively being built out alongside the backend. No license yet.
+Production React dashboard used by Ras Hailu Gym staff to manage members, coaches, subscriptions, payment verification, and business reporting.
