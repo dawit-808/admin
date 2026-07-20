@@ -64,12 +64,6 @@ function Coaches() {
             <h1 className="text-2xl font-semibold tracking-tight text-zinc-900 dark:text-white">
               Coaches Team
             </h1>
-            <p className="text-xs text-zinc-400">
-              Manage directory and contact information for all staff members.
-            </p>
-          </div>
-          <div className="text-[11px] font-mono font-bold text-zinc-700 dark:text-zinc-300 bg-white dark:bg-zinc-900 px-4 py-1.5 rounded-full border border-zinc-200 dark:border-zinc-800 shadow-sm w-fit">
-            STAFF_COUNT // {coaches.length.toString().padStart(2, "0")}
           </div>
         </header>
 

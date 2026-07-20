@@ -1,18 +1,14 @@
-import React, { useState, useEffect } from "react";
-import SearchIcon from "@mui/icons-material/Search";
-import Pagination from "@mui/material/Pagination";
-import MoreVertIcon from "@mui/icons-material/MoreVert";
-import Menu from "@mui/material/Menu";
-import MenuItem from "@mui/material/MenuItem";
-import Dialog from "@mui/material/Dialog";
-import DialogTitle from "@mui/material/DialogTitle";
-import DialogContent from "@mui/material/DialogContent";
-import DialogActions from "@mui/material/DialogActions";
-import Button from "@mui/material/Button";
-import CircularProgress from "@mui/material/CircularProgress";
-import CheckCircleIcon from "@mui/icons-material/CheckCircle";
-import CancelIcon from "@mui/icons-material/Cancel";
-import DeleteForeverRoundedIcon from "@mui/icons-material/DeleteForeverRounded";
+import React, { useState, useEffect, useRef } from "react";
+import {
+  Search,
+  MoreVertical,
+  CheckCircle2,
+  XCircle,
+  Trash2,
+  Loader2,
+  ChevronLeft,
+  ChevronRight,
+} from "lucide-react";
 import { useNavigate } from "react-router-dom";
 import api from "../api/api";
 
@@ -29,15 +25,16 @@ function MembersTable({
 }) {
   const navigate = useNavigate();
 
-  // ── MENU STATE ──
-  const [anchorEl, setAnchorEl] = useState(null);
+  // ── ROW MENU STATE ──
+  const [openMenuId, setOpenMenuId] = useState(null);
   const [selectedMember, setSelectedMember] = useState(null);
+  const menuRef = useRef(null);
 
   // ── DELETE STATE ──
   const [deleteOpen, setDeleteOpen] = useState(false);
   const [deleting, setDeleting] = useState(false);
 
-  // ── NOTIFICATION NOTIFICATION STATES ──
+  // ── NOTIFICATION STATES ──
   const [successMessage, setSuccessMessage] = useState("");
   const [errorMessage, setErrorMessage] = useState("");
 
@@ -49,21 +46,32 @@ function MembersTable({
     }
   }, [successMessage]);
 
-  // OPEN MENU
-  const openMenu = (event, member) => {
-    setAnchorEl(event.currentTarget);
+  // Close the row menu on outside click
+  useEffect(() => {
+    if (openMenuId === null) return;
+    const handleClickOutside = (e) => {
+      if (menuRef.current && !menuRef.current.contains(e.target)) {
+        setOpenMenuId(null);
+      }
+    };
+    document.addEventListener("mousedown", handleClickOutside);
+    return () => document.removeEventListener("mousedown", handleClickOutside);
+  }, [openMenuId]);
+
+  // OPEN ROW MENU
+  const openMenu = (member) => {
     setSelectedMember(member);
+    setOpenMenuId(member.id);
   };
 
   const closeMenu = () => {
-    setAnchorEl(null);
-    setSelectedMember(null);
+    setOpenMenuId(null);
   };
 
   // OPEN DELETE DIALOG
   const handleDeleteClick = () => {
     setDeleteOpen(true);
-    setAnchorEl(null);
+    closeMenu();
     setErrorMessage(""); // reset errors upon selection
   };
 
@@ -84,10 +92,8 @@ function MembersTable({
       setDeleting(true);
       setErrorMessage("");
 
-      // Hitting your updated route structure
       const res = await api.delete(`/members/${selectedMember.id}`);
 
-      // Look for the standard clean backend object payload
       if (res.data?.success || res.status === 200) {
         setSuccessMessage(
           res.data?.message || "Member record has been removed successfully.",
@@ -101,23 +107,32 @@ function MembersTable({
       }
     } catch (err) {
       console.error("Failed to delete member:", err);
-      // Extracts backend error message strings or fails back gently
       setErrorMessage(
         err?.response?.data?.message ||
           err?.response?.data?.error ||
-          "Server connection failure during erasure.",
+          "Something went wrong while deleting this member.",
       );
     } finally {
       setDeleting(false);
     }
   };
 
+  // Small window of page numbers around the current page (max 5)
+  const pageNumbers = () => {
+    if (!totalPages || totalPages <= 1) return [];
+    const span = 2;
+    const start = Math.max(1, page - span);
+    const end = Math.min(totalPages, page + span);
+    const pages = [];
+    for (let i = start; i <= end; i++) pages.push(i);
+    return pages;
+  };
+
   return (
     <>
-      {/* ── GLOBAL STATUS SUCCESS MESSAGE TOAST BANNER ── */}
       {successMessage && (
         <div className="mb-4 flex items-center gap-2.5 bg-emerald-500/10 border border-emerald-500/20 text-emerald-600 dark:text-emerald-400 p-3.5 rounded-xl text-xs font-medium animate-in fade-in slide-in-from-top-2 duration-300">
-          <CheckCircleIcon sx={{ fontSize: 16 }} />
+          <CheckCircle2 size={16} />
           <span>{successMessage}</span>
         </div>
       )}
@@ -134,9 +149,9 @@ function MembersTable({
           {/* Search Field */}
           <div className="relative group">
             <div className="absolute inset-y-0 left-0 pl-3.5 flex items-center pointer-events-none">
-              <SearchIcon
+              <Search
+                size={14}
                 className="text-zinc-400 group-focus-within:text-zinc-900 dark:group-focus-within:text-zinc-100 transition-colors"
-                sx={{ fontSize: 16 }}
               />
             </div>
             <input
@@ -258,13 +273,37 @@ function MembersTable({
                         <StatusBadge paid={m.payment_status} />
                       </td>
 
-                      <td className="px-6 py-4 text-right pr-8">
+                      <td className="px-6 py-4 text-right pr-8 relative">
                         <button
-                          onClick={(e) => openMenu(e, m)}
+                          onClick={() => openMenu(m)}
                           className="p-1.5 rounded-full text-zinc-400 hover:text-zinc-900 dark:hover:text-zinc-100 hover:bg-zinc-100 dark:hover:bg-zinc-800/80 active:scale-95 transition-all cursor-pointer"
                         >
-                          <MoreVertIcon sx={{ fontSize: 16 }} />
+                          <MoreVertical size={16} />
                         </button>
+
+                        {/* ── ROW ACTIONS DROPDOWN ── */}
+                        {openMenuId === m.id && (
+                          <div
+                            ref={menuRef}
+                            className="absolute right-6 top-full mt-1 w-40 bg-white dark:bg-zinc-900 border border-zinc-200 dark:border-zinc-800 rounded-lg shadow-lg z-20 py-1 text-left"
+                          >
+                            <button
+                              onClick={() => {
+                                navigate(`/profile/${selectedMember?.id}`);
+                                closeMenu();
+                              }}
+                              className="w-full text-left px-3 py-2 text-xs text-zinc-700 dark:text-zinc-300 hover:bg-zinc-50 dark:hover:bg-zinc-800 transition-colors"
+                            >
+                              View Profile
+                            </button>
+                            <button
+                              onClick={handleDeleteClick}
+                              className="w-full text-left px-3 py-2 text-xs text-red-600 hover:bg-red-50 dark:hover:bg-red-500/10 transition-colors"
+                            >
+                              Delete Member
+                            </button>
+                          </div>
+                        )}
                       </td>
                     </tr>
                   );
@@ -279,10 +318,6 @@ function MembersTable({
                       <p className="font-medium text-zinc-700 dark:text-zinc-300">
                         No members found
                       </p>
-                      <p className="text-[11px] text-zinc-400">
-                        We couldn't find matches for your current keyword search
-                        settings.
-                      </p>
                     </div>
                   </td>
                 </tr>
@@ -292,133 +327,119 @@ function MembersTable({
         </div>
 
         {/* ── PAGINATION CONTROLS ── */}
-        <div className="px-6 py-4.5 border-t border-zinc-100 dark:border-zinc-800/80 flex items-center justify-center bg-zinc-50/20 dark:bg-zinc-900/5">
-          <Pagination
-            count={totalPages}
-            page={page}
-            onChange={(_, value) => setPage(value)}
-            size="small"
-            sx={{
-              "& .MuiPaginationItem-root": {
-                color: "rgb(161 161 170)",
-                fontSize: "11px",
-                fontFamily: "monospace",
-                borderRadius: "9999px",
-                "&:hover": {
-                  backgroundColor: "rgba(244, 244, 245, 0.1)",
-                },
-              },
-              "& .Mui-selected": {
-                backgroundColor: "rgb(24 24 27) !important",
-                color: "#ffffff !important",
-                ".dark &": {
-                  backgroundColor: "#ffffff !important",
-                  color: "rgb(9 9 11) !important",
-                },
-              },
-            }}
-          />
-        </div>
+        {totalPages > 1 && (
+          <div className="px-6 py-4.5 border-t border-zinc-100 dark:border-zinc-800/80 flex items-center justify-center gap-1 bg-zinc-50/20 dark:bg-zinc-900/5">
+            <button
+              onClick={() => setPage(Math.max(1, page - 1))}
+              disabled={page === 1}
+              className="p-1.5 rounded-full text-zinc-400 hover:text-zinc-900 dark:hover:text-zinc-100 hover:bg-zinc-100 dark:hover:bg-zinc-800/80 disabled:opacity-30 disabled:hover:bg-transparent transition-all"
+            >
+              <ChevronLeft size={14} />
+            </button>
+
+            {pageNumbers().map((p) => (
+              <button
+                key={p}
+                onClick={() => setPage(p)}
+                className={`min-w-7 h-7 px-2 rounded-full text-[11px] font-mono transition-colors ${
+                  p === page
+                    ? "bg-zinc-900 text-white dark:bg-white dark:text-zinc-900"
+                    : "text-zinc-500 hover:bg-zinc-100 dark:hover:bg-zinc-800/60"
+                }`}
+              >
+                {p}
+              </button>
+            ))}
+
+            <button
+              onClick={() => setPage(Math.min(totalPages, page + 1))}
+              disabled={page === totalPages}
+              className="p-1.5 rounded-full text-zinc-400 hover:text-zinc-900 dark:hover:text-zinc-100 hover:bg-zinc-100 dark:hover:bg-zinc-800/80 disabled:opacity-30 disabled:hover:bg-transparent transition-all"
+            >
+              <ChevronRight size={14} />
+            </button>
+          </div>
+        )}
       </div>
 
-      {/* ── ACTIONS MENU ── */}
-      <Menu anchorEl={anchorEl} open={Boolean(anchorEl)} onClose={closeMenu}>
-        <MenuItem
-          onClick={() => {
-            navigate(`/profile/${selectedMember?.id}`);
-            closeMenu();
-          }}
-        >
-          View Profile
-        </MenuItem>
-        <MenuItem onClick={handleDeleteClick} sx={{ color: "red" }}>
-          Delete Member
-        </MenuItem>
-      </Menu>
-
       {/* ── CONFIRM DELETE DIALOG ── */}
-      <Dialog
-        open={deleteOpen}
-        onClose={handleCloseDelete}
-        maxWidth="xs"
-        fullWidth
-      >
-        <DialogTitle sx={{ fontSize: "1rem", fontWeight: 600 }}>
-          Delete Member
-        </DialogTitle>
-        <DialogContent sx={{ pt: 1 }}>
-          <div className="flex flex-col items-center text-center">
-            <div className="w-16 h-16 rounded-full bg-red-100 dark:bg-red-500/10 flex items-center justify-center mb-5">
-              <DeleteForeverRoundedIcon
-                sx={{
-                  fontSize: 34,
-                  color: "#dc2626",
-                }}
-              />
+      {deleteOpen && (
+        <div
+          className="fixed inset-0 z-50 flex items-center justify-center bg-black/40 backdrop-blur-[2px] p-4"
+          onClick={handleCloseDelete}
+        >
+          <div
+            className="w-full max-w-xs bg-white dark:bg-zinc-900 rounded-2xl shadow-xl overflow-hidden"
+            onClick={(e) => e.stopPropagation()}
+          >
+            <div className="px-6 pt-6">
+              <h3 className="text-base font-semibold text-zinc-900 dark:text-white">
+                Delete Member
+              </h3>
             </div>
 
-            <h3 className="text-lg font-semibold text-zinc-900 dark:text-white">
-              Delete Member?
-            </h3>
+            <div className="px-6 pt-3 pb-2 flex flex-col items-center text-center">
+              <div className="w-16 h-16 rounded-full bg-red-100 dark:bg-red-500/10 flex items-center justify-center mb-5">
+                <Trash2 size={30} className="text-red-600" />
+              </div>
 
-            <p className="mt-3 text-sm text-zinc-500 leading-relaxed max-w-sm">
-              You are about to permanently remove
-            </p>
+              <h3 className="text-lg font-semibold text-zinc-900 dark:text-white">
+                Delete Member?
+              </h3>
 
-            <p className="font-semibold text-red-600 text-base mt-1">
-              {selectedMember?.name}
-            </p>
-
-            <div className="mt-5 w-full rounded-xl border border-red-200 dark:border-red-900 bg-red-50 dark:bg-red-500/5 p-4 text-left">
-              <p className="text-xs font-semibold uppercase tracking-wide text-red-600 mb-2">
-                This will delete:
+              <p className="mt-3 text-sm text-zinc-500 leading-relaxed max-w-sm">
+                You are about to permanently remove
               </p>
 
-              <ul className="space-y-1 text-xs text-zinc-600 dark:text-zinc-300">
-                <li>• Member profile</li>
-                <li>• Payment history</li>
-                <li>• Attendance records</li>
-                <li>• Health information</li>
-              </ul>
+              <p className="font-semibold text-red-600 text-base mt-1">
+                {selectedMember?.name}
+              </p>
+
+              <div className="mt-5 w-full rounded-xl border border-red-200 dark:border-red-900 bg-red-50 dark:bg-red-500/5 p-4 text-left">
+                <p className="text-xs font-semibold uppercase tracking-wide text-red-600 mb-2">
+                  This will delete:
+                </p>
+
+                <ul className="space-y-1 text-xs text-zinc-600 dark:text-zinc-300">
+                  <li>• Member profile</li>
+                  <li>• Payment history</li>
+                  <li>• Attendance records</li>
+                  <li>• Health information</li>
+                </ul>
+              </div>
+
+              <p className="mt-4 text-xs text-red-500 font-medium">
+                This action cannot be undone.
+              </p>
+
+              {errorMessage && (
+                <div className="mt-5 w-full flex items-start gap-2 bg-red-500/5 border border-red-500/20 rounded-xl p-3">
+                  <XCircle size={18} className="text-red-500 shrink-0" />
+                  <span className="text-xs text-red-500">{errorMessage}</span>
+                </div>
+              )}
             </div>
 
-            <p className="mt-4 text-xs text-red-500 font-medium">
-              This action cannot be undone.
-            </p>
-
-            {errorMessage && (
-              <div className="mt-5 w-full flex items-start gap-2 bg-red-500/5 border border-red-500/20 rounded-xl p-3">
-                <CancelIcon sx={{ fontSize: 18, color: "#ef4444" }} />
-                <span className="text-xs text-red-500">{errorMessage}</span>
-              </div>
-            )}
+            <div className="px-6 pb-5 pt-3 flex justify-end gap-2">
+              <button
+                onClick={handleCloseDelete}
+                disabled={deleting}
+                className="px-3 py-1.5 rounded-lg text-xs font-medium text-zinc-500 hover:bg-zinc-100 dark:hover:bg-zinc-800 disabled:opacity-50 transition-colors"
+              >
+                Cancel
+              </button>
+              <button
+                onClick={deleteMember}
+                disabled={deleting}
+                className="flex items-center gap-1.5 px-3 py-1.5 rounded-lg text-xs font-medium bg-red-600 text-white hover:bg-red-700 disabled:opacity-60 transition-colors"
+              >
+                {deleting && <Loader2 size={12} className="animate-spin" />}
+                {deleting ? "Deleting..." : "Delete Member"}
+              </button>
+            </div>
           </div>
-        </DialogContent>
-        <DialogActions sx={{ px: 3, pb: 2.5 }}>
-          <Button
-            onClick={handleCloseDelete}
-            disabled={deleting}
-            size="small"
-            sx={{ textTransform: "none", color: "text.secondary" }}
-          >
-            Cancel
-          </Button>
-          <Button
-            onClick={deleteMember}
-            color="error"
-            variant="contained"
-            disabled={deleting}
-            size="small"
-            disableElevation
-            sx={{ textTransform: "none", borderRadius: "8px" }}
-            startIcon={
-              deleting ? <CircularProgress size={12} color="inherit" /> : null
-            }
-          >
-            {deleting ? "Deleting..." : "Delete Member"}
-          </Button>
-        </DialogActions>
-      </Dialog>
+        </div>
+      )}
     </>
   );
 }

@@ -11,27 +11,6 @@ function colorFor(gender) {
   return GENDER_COLORS[gender?.toLowerCase()] || GENDER_COLORS.other;
 }
 
-function CustomTooltip({ active, payload, total }) {
-  if (!active || !payload?.length) return null;
-  const item = payload[0];
-  const percent = total > 0 ? Math.round((item.value / total) * 100) : 0;
-
-  return (
-    <div className="bg-[#09090b] px-3 py-2 text-sm border border-zinc-800">
-      <div className="flex items-center gap-2">
-        <span
-          className="h-2 w-2 rounded-full"
-          style={{ backgroundColor: item.payload.fill }}
-        />
-        <span className="font-medium text-white">{item.name}</span>
-      </div>
-      <div className="mt-0.5 text-zinc-400">
-        {item.value} members · {percent}%
-      </div>
-    </div>
-  );
-}
-
 function GenderChart({ data }) {
   const [activeIndex, setActiveIndex] = useState(null);
 
@@ -83,7 +62,6 @@ function GenderChart({ data }) {
                   />
                 ))}
               </Pie>
-              <Tooltip content={<CustomTooltip total={total} />} />
             </PieChart>
           </ResponsiveContainer>
           <div className="pointer-events-none absolute inset-0 flex flex-col items-center justify-center">

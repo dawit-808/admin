@@ -67,9 +67,6 @@ function Statistics() {
           <h1 className="text-xl font-bold text-zinc-900 dark:text-white">
             Statistics
           </h1>
-          <p className="text-sm text-zinc-500 mt-0.5">
-            Overview of your gym performance.
-          </p>
         </div>
 
         <div className="grid gap-4 grid-cols-1 sm:grid-cols-2 xl:grid-cols-4">

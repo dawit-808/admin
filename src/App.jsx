@@ -43,13 +43,10 @@ function AppRoutes() {
         <Route path="/add-member" element={<AddMemberPage />} />
         <Route path="/add-coach" element={<AddCoachPage />} />
         <Route path="/verify-payment" element={<VerifyPayment />} />
+        <Route path="/profile/:id" element={<MemberProfile />} />
+        <Route path="/coaches/:id" element={<CoachProfile />} />
       </Route>
 
-      {/* Hybrid/Shared Routes */}
-      <Route path="/profile/:id" element={<MemberProfile />} />
-      <Route path="/coaches/:id" element={<CoachProfile />} />
-
-      {/* Catch-all: Redirect unknown to Dashboard */}
       <Route path="*" element={<Navigate to="/" replace />} />
     </Routes>
   );
