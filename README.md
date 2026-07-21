@@ -4,7 +4,7 @@ Frontend for a gym management system lets staff register members and coaches, tr
 
 Built with React + Vite. Talks to a separate backend over REST.
 
-Pairs with the [backend](https://github.com/yonatanfeseha/ras-new-backend) — that repo has the API and database, this one is just the UI.
+Pairs with the [backend](https://github.com/dawit-808/gymBackend) — that repo has the API and database, this one is just the UI.
 
 ## What it does
 
@@ -29,7 +29,7 @@ React 19, Vite, Tailwind CSS, MUI, React Router, Axios, Recharts.
 
 ## Getting started
 
-You'll need Node 18+ and the [backend](https://github.com/yonatanfeseha/ras-new-backend) running.
+You'll need Node 18+ and the [backend](https://github.com/dawit-808/gymBackend) running.
 
 ```bash
 git clone https://github.com/dawit-808/admin.git
